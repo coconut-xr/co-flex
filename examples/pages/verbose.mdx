@@ -1,0 +1,20 @@
+# Flex Verbose
+
+import { FlexVerbose, FlexVerboseRoot } from "../components/flex-verbose"
+import { SliderInput } from "../components/slider-input"
+
+<SliderInput>
+    {(value) => (
+        <FlexVerboseRoot>
+            <FlexVerbose flexGrow={value} />
+            <FlexVerbose flexGrow={1} />
+        </FlexVerboseRoot>
+    )}
+</SliderInput>
+
+```typescript
+<FlexVerboseRoot>
+    <FlexVerbose flexGrow={sliderValue} />
+    <FlexVerbose flexGrow={1} />
+</FlexVerboseRoot>
+```

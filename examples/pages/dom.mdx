@@ -1,0 +1,27 @@
+# Flex Dom
+
+import { FlexDom, FlexDomRoot } from "../components/flex-dom"
+import { SliderInput } from "../components/slider-input"
+import { FLEX_DIRECTION_ROW, FLEX_DIRECTION_COLUMN } from "yoga-layout-prebuilt"
+
+<SliderInput>
+    {(value) => (
+        <FlexDomRoot flexDirection={FLEX_DIRECTION_ROW}>
+            <FlexDom flexDirection={FLEX_DIRECTION_COLUMN} index={0} flexGrow={value}>
+                <FlexDom index={0} flexGrow={value} />
+                <FlexDom index={1} flexGrow={1} />
+            </FlexDom>
+            <FlexDom index={1} flexGrow={1} />
+        </FlexDomRoot>
+    )}
+</SliderInput>
+
+```typescript
+<FlexDomRoot flexDirection={FLEX_DIRECTION_ROW}>
+    <FlexDom flexDirection={FLEX_DIRECTION_COLUMN} index={0} flexGrow={value}>
+        <FlexDom index={0} flexGrow={value}></FlexDom>
+        <FlexDom index={1} flexGrow={1} />
+    </FlexDom>
+    <FlexDom index={1} flexGrow={1} />
+</FlexDomRoot>
+```
