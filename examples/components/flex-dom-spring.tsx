@@ -1,4 +1,5 @@
-import { useYogaNode, useYogaNodeContext, useYogaRootNode, YogaNodeContextProvider, YogaNodeProperties } from "co-flex"
+import { useYogaNode, useFlexNodeContext, useYogaRootNode, FlexNodeContextProvider } from "co-flex"
+import { YogaNodeProperties } from "co-yoga"
 import React, { PropsWithChildren, useCallback, useState } from "react"
 import { a, useSpring } from "@react-spring/web"
 
@@ -8,17 +9,17 @@ export function FlexDomSpring({
     ...props
 }: PropsWithChildren<Partial<{ index?: number } & YogaNodeProperties>>) {
     const [style, api] = useSpring({ top: -1, left: -1, width: -1, height: -1 }, [])
-    const context = useYogaNodeContext()
+    const context = useFlexNodeContext()
     const node = useYogaNode(
         props,
         index ?? 0,
         useCallback(
-            (getLayoutValue) => {
+            (node) => {
                 const newStyle = {
-                    width: getLayoutValue("width"),
-                    height: getLayoutValue("height"),
-                    left: getLayoutValue("left"),
-                    top: getLayoutValue("top"),
+                    width: node.getComputed("width"),
+                    height: node.getComputed("height"),
+                    left: node.getComputed("left"),
+                    top: node.getComputed("top"),
                 }
                 if (style.width.get() === -1) {
                     api.set(newStyle)
@@ -31,11 +32,9 @@ export function FlexDomSpring({
     )
 
     return (
-        <YogaNodeContextProvider newParent={node} context={context}>
-            <a.div style={{ border: "1px solid #000", position: "absolute", ...style }}>
-                <div style={{ position: "relative" }}>{children}</div>
-            </a.div>
-        </YogaNodeContextProvider>
+        <FlexNodeContextProvider newNode={node} context={context}>
+            <a.div style={{ border: "1px solid #000", position: "absolute", ...style }}>{children}</a.div>
+        </FlexNodeContextProvider>
     )
 }
 
@@ -44,12 +43,12 @@ export function FlexDomSpringRoot({ children, ...props }: PropsWithChildren<Part
     const context = useYogaRootNode(
         props,
         useCallback(
-            (getLayoutValue) => {
+            (node) => {
                 const newStyle = {
-                    width: getLayoutValue("width"),
-                    height: getLayoutValue("height"),
-                    left: getLayoutValue("left"),
-                    top: getLayoutValue("top"),
+                    width: node.getComputed("width"),
+                    height: node.getComputed("height"),
+                    left: node.getComputed("left"),
+                    top: node.getComputed("top"),
                 }
                 if (style.width.get() === -1) {
                     api.set(newStyle)
@@ -59,16 +58,16 @@ export function FlexDomSpringRoot({ children, ...props }: PropsWithChildren<Part
             },
             [api]
         ),
-        global.window != null ? window.innerWidth : 300,
-        300
+        10,
+        1
     )
     return (
         <div style={{ width: global.window != null ? window.innerWidth : 300, height: 300, position: "relative" }}>
-            <YogaNodeContextProvider context={context}>
+            <FlexNodeContextProvider context={context}>
                 <a.div style={{ border: "1px solid #000", position: "absolute", ...style }}>
                     <div style={{ position: "relative" }}>{children}</div>
                 </a.div>
-            </YogaNodeContextProvider>
+            </FlexNodeContextProvider>
         </div>
     )
 }

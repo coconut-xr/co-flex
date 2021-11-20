@@ -1,7 +1,7 @@
 import { VirtualBase } from "co-virtualize"
 import React, { useState } from "react"
 
-export function Switch({ a, b }: { a: JSX.Element; b: JSX.Element }) {
+export function DomSwitch({ a, b }: { a: JSX.Element; b: JSX.Element }) {
     const [isA, setA] = useState(true)
     return (
         <>

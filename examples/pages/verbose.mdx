@@ -5,7 +5,7 @@ import { SliderInput } from "../components/slider-input"
 
 <SliderInput>
     {(value) => (
-        <FlexVerboseRoot>
+        <FlexVerboseRoot width={1} height={1}>
             <FlexVerbose flexGrow={value} />
             <FlexVerbose flexGrow={1} />
         </FlexVerboseRoot>
@@ -13,8 +13,8 @@ import { SliderInput } from "../components/slider-input"
 </SliderInput>
 
 ```typescript
-<FlexVerboseRoot>
-    <FlexVerbose flexGrow={sliderValue} />
+<FlexVerboseRoot width={1} height={1}>
+    <FlexVerbose flexGrow={value} />
     <FlexVerbose flexGrow={1} />
 </FlexVerboseRoot>
 ```

@@ -10,12 +10,14 @@ import React, {
     useRef,
     useState,
 } from "react"
-import { a, useSpring } from "@react-spring/web"
+import { a, useSpring } from "@react-spring/three"
 import { useVirtual, VirtualBase, VirtualProps } from "co-virtualize"
+import { BoxBufferGeometry, Vector3Tuple } from "three"
+import { Canvas } from "@react-three/fiber"
 
-const OffsetContext = createContext<{ zIndex?: number; left?: number; top?: number }>(null as any)
+const OffsetContext = createContext<{ position?: Vector3Tuple }>(null as any)
 
-export function FlexDomSpringVirtualized({
+export function FlexThreeSpringVirtualized({
     id,
     children,
     index,
@@ -30,25 +32,25 @@ export function FlexDomSpringVirtualized({
         useCallback(
             (node) =>
                 setLayout({
-                    width: node.getComputed("width"),
-                    height: node.getComputed("height"),
-                    left: node.getComputed("left"),
-                    top: node.getComputed("top"),
+                    position: [node.getComputed("left"), node.getComputed("top"), 0],
+                    scale: [node.getComputed("width"), node.getComputed("height"), depth],
                 }),
             []
         )
     )
 
-    const globalLayout = useMemo<Layout & { zIndex: number }>(
+    const globalLayout = useMemo<Layout>(
         () => ({
             ...layout,
-            zIndex: (offset.zIndex ?? 0) + 1,
-            top: (offset.top ?? 0) + (layout.top ?? 0),
-            left: (offset.left ?? 0) + (layout.left ?? 0),
+            position: [
+                (layout.position?.[0] ?? 0) + (offset.position?.[0] ?? 0),
+                (layout.position?.[1] ?? 0) + (offset.position?.[1] ?? 0),
+                (layout.position?.[2] ?? 0) + (offset.position?.[2] ?? 0) + depth,
+            ],
         }),
         [offset, layout]
     )
-    useVirtual(VirtualizedDiv, globalLayout, index, id)
+    useVirtual(VirtualizedBox, globalLayout, index, id)
 
     return (
         <FlexNodeContextProvider newNode={node} context={context}>
@@ -57,24 +59,24 @@ export function FlexDomSpringVirtualized({
     )
 }
 
-export type Layout = { top?: number; left?: number; width?: number; height?: number }
+export type Layout = { position?: Vector3Tuple; scale?: Vector3Tuple }
 
-export function FlexDomSpringVirtualizedRoot({ children, ...props }: PropsWithChildren<Partial<YogaNodeProperties>>) {
+const depth = 0.1
+
+export function FlexThreeSpringVirtualizedRoot({ children, ...props }: PropsWithChildren<Partial<YogaNodeProperties>>) {
     const [layout, setLayout] = useState<Layout>({})
     const context = useYogaRootNode(
         props,
         useCallback(
             (node) =>
                 setLayout({
-                    width: node.getComputed("width"),
-                    height: node.getComputed("height"),
-                    left: node.getComputed("left"),
-                    top: node.getComputed("top"),
+                    position: [node.getComputed("left"), node.getComputed("top"), 0],
+                    scale: [node.getComputed("width"), node.getComputed("height"), depth],
                 }),
             []
         ),
         10,
-        1
+        0.01
     )
     return (
         <FlexNodeContextProvider context={context}>
@@ -83,32 +85,24 @@ export function FlexDomSpringVirtualizedRoot({ children, ...props }: PropsWithCh
     )
 }
 
-export function VirtualizedDiv({
-    connected,
-    destroy,
-    zIndex,
-    index,
-    width,
-    height,
-    left,
-    top,
-}: VirtualProps & Layout & { zIndex?: number }) {
+const geometry = new BoxBufferGeometry(1, 1, 1)
+geometry.translate(0.5, 0.5, 0.5)
+
+export function VirtualizedBox({ connected, destroy, index, position: p, scale: s }: VirtualProps & Layout) {
     const layoutCache = useRef<Layout>({})
     const layout = useMemo(() => {
-        if (connected && width != null) {
+        if (connected && p != null) {
             layoutCache.current = {
-                width,
-                height,
-                left,
-                top,
+                position: p,
+                scale: s,
             }
         }
         return layoutCache.current
-    }, [width, height, left, top, connected])
-    const [style] = useSpring(
+    }, [p, s, top, connected])
+    const [{ position, opacity, scale }] = useSpring(
         {
             ...layout,
-            opacity: layout.width != null && connected ? 1 : 0,
+            opacity: layout.position != null && connected ? 1 : 0,
             onRest: {
                 opacity: (val) => {
                     if (val.value === 0) {
@@ -119,15 +113,10 @@ export function VirtualizedDiv({
         },
         [layout, connected]
     )
+
     return (
-        <a.div
-            style={{
-                backgroundColor: "#fff",
-                boxShadow: "0px 0px 20px rgba(0,0,0,0.2)",
-                zIndex,
-                position: "absolute",
-                ...style,
-            }}
-        />
+        <a.mesh geometry={geometry} position={position} scale={scale}>
+            <a.meshPhongMaterial toneMapped={false} transparent color={0xffffff} opacity={opacity} />
+        </a.mesh>
     )
 }

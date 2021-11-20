@@ -1,29 +1,30 @@
-import { useYogaNode, useYogaNodeContext, useYogaRootNode, YogaNodeContextProvider, YogaNodeProperties } from "co-flex"
+import { useYogaNode, useFlexNodeContext, useYogaRootNode, FlexNodeContextProvider } from "co-flex"
+import { YogaNodeProperties } from "co-yoga"
 import React, { PropsWithChildren, useCallback, useState } from "react"
 
 export function FlexVerbose({ children, ...props }: PropsWithChildren<Partial<YogaNodeProperties>>) {
     const [{ width, height }, setSize] = useState({ width: 0, height: 0 })
-    const context = useYogaNodeContext()
+    const context = useFlexNodeContext()
     const node = useYogaNode(
         props,
         0,
         useCallback(
-            (getLayoutValue) =>
+            (node) =>
                 setSize({
-                    width: (getLayoutValue as any)("width"),
-                    height: (getLayoutValue as any)("height"),
+                    width: node.getComputed("width"),
+                    height: node.getComputed("height"),
                 }),
             [setSize]
         )
     )
 
     return (
-        <YogaNodeContextProvider newParent={node} context={context}>
+        <FlexNodeContextProvider newNode={node} context={context}>
             <p>
                 {width} x {height}
             </p>
             <div style={{ marginLeft: 10 }}>{children}</div>
-        </YogaNodeContextProvider>
+        </FlexNodeContextProvider>
     )
 }
 
@@ -32,22 +33,20 @@ export function FlexVerboseRoot({ children, ...props }: PropsWithChildren<Partia
     const context = useYogaRootNode(
         props,
         useCallback(
-            (getLayoutValue) =>
+            (node) =>
                 setSize({
-                    width: getLayoutValue("width"),
-                    height: getLayoutValue("height"),
+                    width: node.getComputed("width"),
+                    height: node.getComputed("height"),
                 }),
             [setSize]
-        ),
-        1,
-        1
+        )
     )
     return (
-        <YogaNodeContextProvider context={context}>
+        <FlexNodeContextProvider context={context}>
             <p>
                 {width} x {height}
             </p>
             <div style={{ marginLeft: 10 }}>{children}</div>
-        </YogaNodeContextProvider>
+        </FlexNodeContextProvider>
     )
 }

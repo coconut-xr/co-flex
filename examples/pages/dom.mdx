@@ -6,9 +6,9 @@ import { FLEX_DIRECTION_ROW, FLEX_DIRECTION_COLUMN } from "yoga-layout-prebuilt"
 
 <SliderInput>
     {(value) => (
-        <FlexDomRoot flexDirection={FLEX_DIRECTION_ROW}>
-            <FlexDom flexDirection={FLEX_DIRECTION_COLUMN} index={0} flexGrow={value}>
-                <FlexDom index={0} flexGrow={value} />
+        <FlexDomRoot width={300} height={300} flexDirection="row">
+            <FlexDom flexDirection="column" index={0} flexGrow={value}>
+                <FlexDom index={0} flexGrow={value}></FlexDom>
                 <FlexDom index={1} flexGrow={1} />
             </FlexDom>
             <FlexDom index={1} flexGrow={1} />
@@ -17,8 +17,8 @@ import { FLEX_DIRECTION_ROW, FLEX_DIRECTION_COLUMN } from "yoga-layout-prebuilt"
 </SliderInput>
 
 ```typescript
-<FlexDomRoot flexDirection={FLEX_DIRECTION_ROW}>
-    <FlexDom flexDirection={FLEX_DIRECTION_COLUMN} index={0} flexGrow={value}>
+<FlexDomRoot width={300} height={300} flexDirection="row">
+    <FlexDom flexDirection="column" index={0} flexGrow={value}>
         <FlexDom index={0} flexGrow={value}></FlexDom>
         <FlexDom index={1} flexGrow={1} />
     </FlexDom>
