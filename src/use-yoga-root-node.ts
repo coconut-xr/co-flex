@@ -1,28 +1,20 @@
+import { FlexNode, YogaNodeProperties } from "co-yoga"
 import { useCallback, useEffect, useMemo, useRef } from "react"
-import { DIRECTION_LTR, Node, YogaDirection, YogaNode } from "yoga-layout-prebuilt"
-import { BoundGetLayoutValue, getLayoutValue, useBindYogaNodeProperties, YogaNodeContext, YogaNodeProperties } from "."
+import { useBindFlexNodeProperties, FlexNodeContext, ChangeFlexNode } from "."
 
 export function useYogaRootNode(
-    properties: Partial<YogaNodeProperties>,
-    onChange: (getLayoutValue: BoundGetLayoutValue) => void,
-    width: number,
-    height: number,
-    ups: number = 10,
-    precision: number = 0.01, //TODO: no good idea since all values also have to bee calculated wth that precision, or is it???
-    direction: YogaDirection = DIRECTION_LTR
+    properties: YogaNodeProperties,
+    onChange: (node: FlexNode) => void,
+    ups = 10,
+    precision = 0.01
 ) {
-    const rootNode = useMemo(() => Node.create(), [])
+    const node = useMemo(() => new ChangeFlexNode(precision, onChange), [precision, onChange])
     const dirtyRef = useRef(false)
-    const callbackMap = useMemo<Map<YogaNode, (getLayoutValue: BoundGetLayoutValue) => void>>(
-        () => new Map([[rootNode, onChange]]),
-        []
-    )
     const requestLayoutCalculation = useCallback(() => (dirtyRef.current = true), [])
-    useBindYogaNodeProperties(rootNode, requestLayoutCalculation, properties)
+    useBindFlexNodeProperties(node, requestLayoutCalculation, properties)
     useEffect(() => {
         const calculate = () => {
-            rootNode.calculateLayout(width / precision, height / precision, direction)
-            callbackMap.forEach((callback, node) => callback(getLayoutValue.bind(null, node, precision) as any))
+            node.calculateLayout()
             dirtyRef.current = false
         }
         calculate()
@@ -32,22 +24,14 @@ export function useYogaRootNode(
             }
         }, 1000 / ups)
         return () => window.clearInterval(ref)
-    }, [ups, width, precision, direction])
-    const context = useMemo<YogaNodeContext>(
+    }, [ups, node])
+    const context = useMemo<FlexNodeContext>(
         () => ({
-            parentNode: rootNode,
-            createNode: (onChange) => {
-                const node = Node.create()
-                callbackMap.set(node, onChange)
-                return node
-            },
-            destroyNode: (node) => {
-                callbackMap.delete(node)
-                node.free()
-            },
+            node,
+            precision,
             requestLayoutCalculation,
         }),
-        [rootNode]
+        [node, precision]
     )
     return context
 }

@@ -1,19 +1,27 @@
+import { FlexNode, YogaNodeProperties } from "co-yoga"
 import { useEffect, useMemo } from "react"
-import { YogaNode } from "yoga-layout"
-import { BoundGetLayoutValue, useBindYogaNodeProperties, useYogaNodeContext, YogaNodeProperties } from "."
+import { ChangeFlexNode, useBindFlexNodeProperties, useFlexNodeContext } from "."
 
 export function useYogaNode(
-    properties: Partial<YogaNodeProperties>,
+    properties: YogaNodeProperties,
     index: number,
-    onChange: (getLayoutValue: BoundGetLayoutValue) => void
-): YogaNode {
-    const context = useYogaNodeContext()
-    const [node, addChild, removeChild, destroy] = useMemo(() => context.createNode(onChange), [context, onChange])
-    useBindYogaNodeProperties(node, context.requestLayoutCalculation, properties)
+    onChange: (node: FlexNode) => void
+): FlexNode {
+    const context = useFlexNodeContext()
+    const node = useMemo(() => new ChangeFlexNode(context.precision, onChange), [context, onChange])
+    useBindFlexNodeProperties(node, context.requestLayoutCalculation, properties)
     useEffect(() => {
-        context.addChild(node, index)
-        return () => context.removeChild(node)
-    }, [node, context, index])
-    useEffect(() => destroy, [destroy])
+        context.node.insertChild(node)
+        context.requestLayoutCalculation()
+        return () => {
+            context.node.removeChild(node)
+            context.requestLayoutCalculation()
+        }
+    }, [node, context])
+    useEffect(() => {
+        node.index = index
+        context.requestLayoutCalculation()
+    }, [index, node, context])
+    useEffect(() => node.destroy.bind(node), [node])
     return node
 }
