@@ -14,7 +14,7 @@
         "@react-three/fiber": "^7.0.19",
         "bootstrap": "^5.1.3",
         "co-flex": "../dist",
-        "co-virtualize": "^1.0.2",
+        "co-virtualize": "^1.1.0",
         "gray-matter": "^4.0.2",
         "next": "latest",
         "next-mdx-remote": "^3.0.8",

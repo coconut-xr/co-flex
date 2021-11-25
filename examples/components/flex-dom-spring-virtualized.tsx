@@ -19,8 +19,9 @@ export function FlexDomSpringVirtualized({
     id,
     children,
     index,
+    render,
     ...props
-}: PropsWithChildren<Partial<{ id?: string; index?: number } & YogaNodeProperties>>) {
+}: PropsWithChildren<Partial<{ render: boolean; id?: string; index?: number } & YogaNodeProperties>>) {
     const [layout, setLayout] = useState<Layout>({})
     const offset = useContext(OffsetContext)
     const context = useFlexNodeContext()
@@ -39,14 +40,15 @@ export function FlexDomSpringVirtualized({
         )
     )
 
-    const globalLayout = useMemo<Layout & { zIndex: number }>(
+    const globalLayout = useMemo<Layout & { zIndex: number; render?: boolean }>(
         () => ({
             ...layout,
             zIndex: (offset.zIndex ?? 0) + 1,
             top: (offset.top ?? 0) + (layout.top ?? 0),
             left: (offset.left ?? 0) + (layout.left ?? 0),
+            render,
         }),
-        [offset, layout]
+        [offset, layout, render]
     )
     useVirtual(VirtualizedDiv, globalLayout, index, id)
 
@@ -84,31 +86,22 @@ export function FlexDomSpringVirtualizedRoot({ children, ...props }: PropsWithCh
 }
 
 export function VirtualizedDiv({
-    connected,
     destroy,
-    zIndex,
-    index,
-    width,
-    height,
-    left,
-    top,
-}: VirtualProps & Layout & { zIndex?: number }) {
-    const layoutCache = useRef<Layout>({})
-    const layout = useMemo(() => {
-        if (connected && width != null) {
+    controllerProps,
+}: VirtualProps<Layout & { zIndex?: number; render?: boolean }>) {
+    const layoutCache = useRef<Layout & { zIndex?: number; render?: boolean }>({})
+    const { zIndex, render, ...layout } = useMemo(() => {
+        if (controllerProps.length > 0 && controllerProps[0].width != null) {
             layoutCache.current = {
-                width,
-                height,
-                left,
-                top,
+                ...controllerProps[0],
             }
         }
         return layoutCache.current
-    }, [width, height, left, top, connected])
+    }, [controllerProps])
     const [style] = useSpring(
         {
             ...layout,
-            opacity: layout.width != null && connected ? 1 : 0,
+            opacity: layout.width != null && controllerProps.length > 0 ? 1 : 0,
             onRest: {
                 opacity: (val) => {
                     if (val.value === 0) {
@@ -117,15 +110,18 @@ export function VirtualizedDiv({
                 },
             },
         },
-        [layout, connected]
+        [layout, controllerProps]
     )
+    if (!render) {
+        return null
+    }
     return (
         <a.div
             style={{
                 backgroundColor: "#fff",
                 boxShadow: "0px 0px 20px rgba(0,0,0,0.2)",
-                zIndex,
                 position: "absolute",
+                zIndex,
                 ...style,
             }}
         />
