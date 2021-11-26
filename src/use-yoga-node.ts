@@ -8,7 +8,7 @@ export function useYogaNode(
     onChange: (node: FlexNode) => void
 ): FlexNode {
     const context = useFlexNodeContext()
-    const node = useMemo(() => new ChangeFlexNode(context.precision, onChange), [context, onChange])
+    const node = useMemo(() => new ChangeFlexNode(context.precision, onChange), [context.precision, onChange])
     useBindFlexNodeProperties(node, context.requestLayoutCalculation, properties)
     useEffect(() => {
         context.node.insertChild(node)

@@ -13,13 +13,11 @@ export function useBindFlexNodeProperties(
         const prev: Partial<YogaNodeProperties> = prevProps.current
         for (const [key, value] of Object.entries(properties)) {
             if (value != prev[key as keyof YogaNodeProperties]) {
-                console.log(`set ${key} = ${value}`)
                 node.setProperty(key as any, value)
             }
             delete prev[key as keyof YogaNodeProperties]
         }
         for (const [key] of Object.entries(prev)) {
-            console.log(`reset ${key}`)
             node.setProperty(key as any, undefined)
         }
         prevProps.current = { ...properties }

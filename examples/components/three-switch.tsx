@@ -7,9 +7,10 @@ export function ThreeSwitch({ a, b }: { a: JSX.Element; b: JSX.Element }) {
     const [isA, setA] = useState(true)
     return (
         <>
-            <button onClick={() => setA(!isA)}>Switch</button>
+            <button className="btn btn-outline-primary" onClick={() => setA(!isA)}>Switch</button>
             <Canvas style={{ height: 300, width: 300 }}>
-                <pointLight intensity={1.5} position={[1, 1, 1]} />
+                <pointLight intensity={0.5} position={[1, 1, 1]} />
+                <ambientLight intensity={0.5} />
                 <OrbitControls maxZoom={1} target={[0, 0, 0]} />
                 <group position={[-0.5, -0.5, 0]}>
                     <VirtualBase>{isA ? a : b}</VirtualBase>

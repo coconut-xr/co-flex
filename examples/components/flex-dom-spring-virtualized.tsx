@@ -50,6 +50,7 @@ export function FlexDomSpringVirtualized({
         }),
         [offset, layout, render]
     )
+
     useVirtual(VirtualizedDiv, globalLayout, index, id)
 
     return (
@@ -79,9 +80,11 @@ export function FlexDomSpringVirtualizedRoot({ children, ...props }: PropsWithCh
         1
     )
     return (
-        <FlexNodeContextProvider context={context}>
-            <OffsetContext.Provider value={layout}>{children}</OffsetContext.Provider>
-        </FlexNodeContextProvider>
+        <div>
+            <FlexNodeContextProvider context={context}>
+                <OffsetContext.Provider value={layout}>{children}</OffsetContext.Provider>
+            </FlexNodeContextProvider>
+        </div>
     )
 }
 

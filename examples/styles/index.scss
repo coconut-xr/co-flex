@@ -1,0 +1,18 @@
+@import "./prism.css";
+@import "./node_modules/bootstrap/scss/bootstrap.scss";
+
+body {
+    margin: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.fullscreen {
+    min-width: 100%;
+    min-height: 100vh;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+a {
+    text-decoration: none;
+}

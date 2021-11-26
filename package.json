@@ -29,7 +29,7 @@
         "react": "^17.0.2"
     },
     "dependencies": {
-        "co-yoga": "^1.0.3"
+        "co-yoga": "^1.0.4"
     },
     "devDependencies": {
         "@types/node": "^16.11.7",
