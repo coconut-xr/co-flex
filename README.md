@@ -11,9 +11,9 @@ _use flexbox inside react_
 
 ![nested](images/nested.gif)
 
-[_Example: Nested layout animation_](co-flex/three-spring-virtualized)
+[_Example: Nested layout animation_](https://cocoss-org.github.io/co-flex/three-spring-virtualized)
 
-Use it with react-three-fiber, react-dom, and whatever works with react.
+Use it with [react-three-fiber](https://github.com/pmndrs/react-three-fiber), react-dom, or whatever works with react.
 
 # Functionality
 
@@ -30,22 +30,22 @@ useYogaRootNode()
 
 # Examples
 
-## [verbose](co-flex/verbose)
+## [verbose](https://cocoss-org.github.io/co-flex/verbose)
 
 ![verbose](images/verbose.gif)
 
-## [dom](co-flex/dom)
+## [dom](https://cocoss-org.github.io/co-flex/dom)
 
 ![dom](images/dom.gif)
 
-## [react-spring](co-flex/dom-spring)
+## [react-spring](https://cocoss-org.github.io/co-flex/dom-spring)
 
 ![spring](images/spring.gif)
 
-## [co-virtualize](co-flex/dom-spring-virtualized)
+## [co-virtualize](https://cocoss-org.github.io/co-flex/dom-spring-virtualized)
 
 ![virtualized](images/virtualized.gif)
 
-## [three](co-flex/three-spring-virtualized)
+## [three](https://cocoss-org.github.io/co-flex/three-spring-virtualized)
 
 ![three](images/three.gif)
