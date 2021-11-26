@@ -9,13 +9,13 @@ import { Footer } from "../components/footer"
 export default function App({ Component, pageProps }: AppProps<PropsWithChildren<{}>>) {
     return (
         <div className="d-flex flex-column fullscreen">
-            <Head>
+            <head>
                 <title>co-flex</title>
                 <meta name="description" content="Architecting shared applications using js & node.js."></meta>
                 <meta name="viewport" content="initial-scale=1.0, width=device-width" />
                 <link rel="icon" type="image/svg+xml" href={icon} />
                 <link rel="mask-icon" href={icon} color="#fff" />
-            </Head>
+            </head>
             <Header selectedIndex={-1} />
             <div className="container-lg p-3">
                 <Component {...pageProps} />
