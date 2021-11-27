@@ -40,7 +40,7 @@ export function FlexThreeSpringVirtualized({
                     ? [
                           layout.position[0] + offset.position[0],
                           layout.position[1] + offset.position[1],
-                          layout.position[2] + offset.position[2] + depth + (zOffset ?? 0),
+                          layout.position[2] + offset.position[2] + (render ? depth : 0) + (zOffset ?? 0),
                       ]
                     : undefined,
             render,
