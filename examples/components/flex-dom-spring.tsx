@@ -9,8 +9,7 @@ export function FlexDomSpring({
     ...props
 }: PropsWithChildren<Partial<{ index?: number } & YogaNodeProperties>>) {
     const [style, api] = useSpring({ top: -1, left: -1, width: -1, height: -1 }, [])
-    const context = useFlexNodeContext()
-    const node = useYogaNode(
+    const context = useYogaNode(
         props,
         index ?? 0,
         useCallback(
@@ -32,7 +31,7 @@ export function FlexDomSpring({
     )
 
     return (
-        <FlexNodeContextProvider newNode={node} context={context}>
+        <FlexNodeContextProvider context={context}>
             <a.div style={{ border: "1px solid #000", position: "absolute", ...style }}>{children}</a.div>
         </FlexNodeContextProvider>
     )

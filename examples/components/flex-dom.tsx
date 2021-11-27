@@ -8,8 +8,7 @@ export function FlexDom({
     ...props
 }: PropsWithChildren<Partial<{ index?: number } & YogaNodeProperties>>) {
     const [style, setLayout] = useState({ top: 0, left: 0, width: 0, height: 0 })
-    const context = useFlexNodeContext()
-    const node = useYogaNode(
+    const context = useYogaNode(
         props,
         index ?? 0,
         useCallback(
@@ -25,7 +24,7 @@ export function FlexDom({
     )
 
     return (
-        <FlexNodeContextProvider newNode={node} context={context}>
+        <FlexNodeContextProvider context={context}>
             <div style={{ border: "1px solid #000", position: "absolute", ...style }}>
                 <div style={{ position: "relative" }}>{children}</div>
             </div>

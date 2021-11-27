@@ -1,12 +1,12 @@
 import { FlexNode, YogaNodeProperties } from "co-yoga"
 import { useEffect, useMemo } from "react"
-import { ChangeFlexNode, useBindFlexNodeProperties, useFlexNodeContext } from "."
+import { ChangeFlexNode, FlexNodeContext, useBindFlexNodeProperties, useFlexNodeContext } from "."
 
 export function useYogaNode(
     properties: YogaNodeProperties,
     index: number,
     onChange: (node: FlexNode) => void
-): FlexNode {
+): FlexNodeContext {
     const context = useFlexNodeContext()
     const node = useMemo(() => new ChangeFlexNode(context.precision, onChange), [context.precision, onChange])
     useBindFlexNodeProperties(node, context.requestLayoutCalculation, properties)
@@ -23,5 +23,5 @@ export function useYogaNode(
         context.requestLayoutCalculation()
     }, [index, node, context])
     useEffect(() => node.destroy.bind(node), [node])
-    return node
+    return useMemo(() => ({ ...context, node }), [node, context])
 }

@@ -9,13 +9,8 @@ export type FlexNodeContext = {
 
 const FlexNodeContext = createContext<FlexNodeContext>(null as any)
 
-export function FlexNodeContextProvider({
-    children,
-    newNode,
-    context,
-}: React.PropsWithChildren<{ newNode?: FlexNode; context: FlexNodeContext }>) {
-    const ctx = useMemo(() => (newNode == null ? context : { ...context, node: newNode }), [newNode, context])
-    return <FlexNodeContext.Provider value={ctx}> {children}</FlexNodeContext.Provider>
+export function FlexNodeContextProvider({ children, context }: React.PropsWithChildren<{ context: FlexNodeContext }>) {
+    return <FlexNodeContext.Provider value={context}>{children}</FlexNodeContext.Provider>
 }
 
 export function useFlexNodeContext(): FlexNodeContext {

@@ -4,8 +4,7 @@ import React, { PropsWithChildren, useCallback, useState } from "react"
 
 export function FlexVerbose({ children, ...props }: PropsWithChildren<Partial<YogaNodeProperties>>) {
     const [{ width, height }, setSize] = useState({ width: 0, height: 0 })
-    const context = useFlexNodeContext()
-    const node = useYogaNode(
+    const context = useYogaNode(
         props,
         0,
         useCallback(
@@ -19,7 +18,7 @@ export function FlexVerbose({ children, ...props }: PropsWithChildren<Partial<Yo
     )
 
     return (
-        <FlexNodeContextProvider newNode={node} context={context}>
+        <FlexNodeContextProvider context={context}>
             <p>
                 {width} x {height}
             </p>

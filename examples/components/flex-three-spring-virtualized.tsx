@@ -19,8 +19,7 @@ export function FlexThreeSpringVirtualized({
 >) {
     const [layout, setLayout] = useState<Layout>({})
     const offset = useContext(OffsetContext)
-    const context = useFlexNodeContext()
-    const node = useYogaNode(
+    const context = useYogaNode(
         props,
         index ?? 0,
         useCallback(
@@ -51,7 +50,7 @@ export function FlexThreeSpringVirtualized({
     useVirtual(VirtualizedBox, globalLayout, index, id)
 
     return (
-        <FlexNodeContextProvider newNode={node} context={context}>
+        <FlexNodeContextProvider context={context}>
             <OffsetContext.Provider value={globalLayout}>{children}</OffsetContext.Provider>
         </FlexNodeContextProvider>
     )
