@@ -5,8 +5,13 @@ import Head from "next/head"
 import { Header } from "../components/header"
 import icon from "../public/icon.svg"
 import { Footer } from "../components/footer"
+import { useRouter } from "next/dist/client/router"
 
 export default function App({ Component, pageProps }: AppProps<PropsWithChildren<{}>>) {
+    const router = useRouter()
+    if (router.asPath.includes("editor")) {
+        return <Component {...pageProps} />
+    }
     return (
         <div className="d-flex flex-column fullscreen">
             <head>

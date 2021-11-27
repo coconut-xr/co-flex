@@ -61,8 +61,14 @@ export function FlexDomSpringVirtualized({
 
 export type Layout = { top?: number; left?: number; width?: number; height?: number }
 
-export function FlexDomSpringVirtualizedRoot({ children, ...props }: PropsWithChildren<Partial<YogaNodeProperties>>) {
-    const [layout, setLayout] = useState<Layout>({})
+export function FlexDomSpringVirtualizedRoot({
+    render,
+    children,
+    ...props
+}: PropsWithChildren<{ render?: boolean } & Partial<YogaNodeProperties>>) {
+    const [layout, setLayout] = useState<Layout & { render?: boolean }>({
+        render,
+    })
     const context = useYogaRootNode(
         props,
         useCallback(
@@ -72,18 +78,20 @@ export function FlexDomSpringVirtualizedRoot({ children, ...props }: PropsWithCh
                     height: node.getComputed("height"),
                     left: node.getComputed("left"),
                     top: node.getComputed("top"),
+                    render,
                 }),
-            []
+            [render]
         ),
         10,
         1
     )
+
+    useVirtual(VirtualizedDiv, layout)
+
     return (
-        <div>
-            <FlexNodeContextProvider context={context}>
-                <OffsetContext.Provider value={layout}>{children}</OffsetContext.Provider>
-            </FlexNodeContextProvider>
-        </div>
+        <FlexNodeContextProvider context={context}>
+            <OffsetContext.Provider value={layout}>{children}</OffsetContext.Provider>
+        </FlexNodeContextProvider>
     )
 }
 

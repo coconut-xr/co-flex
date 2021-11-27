@@ -25,6 +25,6 @@ export function useBindFlexNodeProperties(
     }, [
         node,
         requestLayoutCalculation,
-        ...Object.entries(properties).reduce<Array<any>>((v1, v2) => v1.concat(v2), []),
+        JSON.stringify(properties)
     ])
 }
