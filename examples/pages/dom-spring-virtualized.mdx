@@ -484,3 +484,152 @@ import { EDGE_ALL, FLEX_DIRECTION_ROW, FLEX_DIRECTION_COLUMN } from "yoga-layout
     <FlexDomSpringVirtualized render id="2" index={0} flexGrow={1} />
 </FlexDomSpringVirtualizedRoot>
 ```
+
+<DomSwitch
+    a={
+        <FlexDomSpringVirtualizedRoot key="A" width={300} height={300} flexDirection="row">
+            <FlexDomSpringVirtualized flexGrow={1} index={0} flexDirection="column">
+                <FlexDomSpringVirtualized
+                    marginLeft={20}
+                    marginRight={20}
+                    marginBottom={20}
+                    marginTop={20}
+                    render
+                    id="0"
+                    index={0}
+                    flexGrow={1}
+                />
+                <FlexDomSpringVirtualized
+                    marginLeft={20}
+                    marginRight={20}
+                    marginBottom={20}
+                    marginTop={20}
+                    render
+                    id="1"
+                    index={1}
+                    flexGrow={1}
+                />
+            </FlexDomSpringVirtualized>
+            <FlexDomSpringVirtualized
+                marginLeft={20}
+                marginRight={20}
+                marginBottom={20}
+                marginTop={20}
+                render
+                id="2"
+                index={1}
+                flexGrow={1}
+            />
+        </FlexDomSpringVirtualizedRoot>
+    }
+    b={
+        <FlexDomSpringVirtualizedRoot key="A" width={300} height={300} flexDirection="row">
+            <FlexDomSpringVirtualized flexGrow={1} index={0} flexDirection="column">
+                <FlexDomSpringVirtualized
+                    marginLeft={20}
+                    marginRight={20}
+                    marginBottom={20}
+                    marginTop={20}
+                    render
+                    id="2"
+                    index={0}
+                    flexGrow={1}
+                />
+                <FlexDomSpringVirtualized
+                    marginLeft={20}
+                    marginRight={20}
+                    marginBottom={20}
+                    marginTop={20}
+                    render
+                    id="0"
+                    index={1}
+                    flexGrow={1}
+                />
+            </FlexDomSpringVirtualized>
+            <FlexDomSpringVirtualized
+                marginLeft={20}
+                marginRight={20}
+                marginBottom={20}
+                marginTop={20}
+                render
+                id="1"
+                index={1}
+                flexGrow={1}
+            />
+        </FlexDomSpringVirtualizedRoot>
+    }
+/>
+
+```typescript
+<FlexDomSpringVirtualizedRoot key="A" width={300} height={300} flexDirection="row">
+    <FlexDomSpringVirtualized flexGrow={1} index={0} flexDirection="column">
+        <FlexDomSpringVirtualized
+            marginLeft={20}
+            marginRight={20}
+            marginBottom={20}
+            marginTop={20}
+            render
+            id="0"
+            index={0}
+            flexGrow={1}
+        />
+        <FlexDomSpringVirtualized
+            marginLeft={20}
+            marginRight={20}
+            marginBottom={20}
+            marginTop={20}
+            render
+            id="1"
+            index={1}
+            flexGrow={1}
+        />
+    </FlexDomSpringVirtualized>
+    <FlexDomSpringVirtualized
+        marginLeft={20}
+        marginRight={20}
+        marginBottom={20}
+        marginTop={20}
+        render
+        id="2"
+        index={1}
+        flexGrow={1}
+    />
+</FlexDomSpringVirtualizedRoot>
+```
+
+```typescript
+<FlexDomSpringVirtualizedRoot key="A" width={300} height={300} flexDirection="row">
+    <FlexDomSpringVirtualized flexGrow={1} index={0} flexDirection="column">
+        <FlexDomSpringVirtualized
+            marginLeft={20}
+            marginRight={20}
+            marginBottom={20}
+            marginTop={20}
+            render
+            id="2"
+            index={0}
+            flexGrow={1}
+        />
+        <FlexDomSpringVirtualized
+            marginLeft={20}
+            marginRight={20}
+            marginBottom={20}
+            marginTop={20}
+            render
+            id="0"
+            index={1}
+            flexGrow={1}
+        />
+    </FlexDomSpringVirtualized>
+    <FlexDomSpringVirtualized
+        marginLeft={20}
+        marginRight={20}
+        marginBottom={20}
+        marginTop={20}
+        render
+        id="1"
+        index={1}
+        flexGrow={1}
+    />
+</FlexDomSpringVirtualizedRoot>
+```

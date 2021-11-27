@@ -484,3 +484,152 @@ import { EDGE_ALL, FLEX_DIRECTION_ROW, FLEX_DIRECTION_COLUMN } from "yoga-layout
     <FlexThreeSpringVirtualized zOffset={0.01} render id="2" index={0} flexGrow={1} />
 </FlexThreeSpringVirtualizedRoot>
 ```
+
+<ThreeSwitch
+    a={
+        <FlexThreeSpringVirtualizedRoot key="A" width={1} height={1} flexDirection="row">
+            <FlexThreeSpringVirtualized flexGrow={1} index={0} flexDirection="column">
+                <FlexThreeSpringVirtualized
+                    marginLeft={0.05}
+                    marginRight={0.05}
+                    marginBottom={0.05}
+                    marginTop={0.05}
+                    render
+                    id="0"
+                    index={0}
+                    flexGrow={1}
+                />
+                <FlexThreeSpringVirtualized
+                    marginLeft={0.05}
+                    marginRight={0.05}
+                    marginBottom={0.05}
+                    marginTop={0.05}
+                    render
+                    id="1"
+                    index={1}
+                    flexGrow={1}
+                />
+            </FlexThreeSpringVirtualized>
+            <FlexThreeSpringVirtualized
+                marginLeft={0.05}
+                marginRight={0.05}
+                marginBottom={0.05}
+                marginTop={0.05}
+                render
+                id="2"
+                index={1}
+                flexGrow={1}
+            />
+        </FlexThreeSpringVirtualizedRoot>
+    }
+    b={
+        <FlexThreeSpringVirtualizedRoot key="A" width={1} height={1} flexDirection="row">
+            <FlexThreeSpringVirtualized flexGrow={1} index={0} flexDirection="column">
+                <FlexThreeSpringVirtualized
+                    marginLeft={0.05}
+                    marginRight={0.05}
+                    marginBottom={0.05}
+                    marginTop={0.05}
+                    render
+                    id="2"
+                    index={0}
+                    flexGrow={1}
+                />
+                <FlexThreeSpringVirtualized
+                    marginLeft={0.05}
+                    marginRight={0.05}
+                    marginBottom={0.05}
+                    marginTop={0.05}
+                    render
+                    id="0"
+                    index={1}
+                    flexGrow={1}
+                />
+            </FlexThreeSpringVirtualized>
+            <FlexThreeSpringVirtualized
+                marginLeft={0.05}
+                marginRight={0.05}
+                marginBottom={0.05}
+                marginTop={0.05}
+                render
+                id="1"
+                index={1}
+                flexGrow={1}
+            />
+        </FlexThreeSpringVirtualizedRoot>
+    }
+/>
+
+```typescript
+<FlexThreeSpringVirtualizedRoot key="A" width={1} height={1} flexDirection="row">
+    <FlexThreeSpringVirtualized flexGrow={1} index={0} flexDirection="column">
+        <FlexThreeSpringVirtualized
+            marginLeft={0.05}
+            marginRight={0.05}
+            marginBottom={0.05}
+            marginTop={0.05}
+            render
+            id="0"
+            index={0}
+            flexGrow={1}
+        />
+        <FlexThreeSpringVirtualized
+            marginLeft={0.05}
+            marginRight={0.05}
+            marginBottom={0.05}
+            marginTop={0.05}
+            render
+            id="1"
+            index={1}
+            flexGrow={1}
+        />
+    </FlexThreeSpringVirtualized>
+    <FlexThreeSpringVirtualized
+        marginLeft={0.05}
+        marginRight={0.05}
+        marginBottom={0.05}
+        marginTop={0.05}
+        render
+        id="2"
+        index={1}
+        flexGrow={1}
+    />
+</FlexThreeSpringVirtualizedRoot>
+```
+
+```typescript
+<FlexThreeSpringVirtualizedRoot key="A" width={1} height={1} flexDirection="row">
+    <FlexThreeSpringVirtualized flexGrow={1} index={0} flexDirection="column">
+        <FlexThreeSpringVirtualized
+            marginLeft={0.05}
+            marginRight={0.05}
+            marginBottom={0.05}
+            marginTop={0.05}
+            render
+            id="2"
+            index={0}
+            flexGrow={1}
+        />
+        <FlexThreeSpringVirtualized
+            marginLeft={0.05}
+            marginRight={0.05}
+            marginBottom={0.05}
+            marginTop={0.05}
+            render
+            id="0"
+            index={1}
+            flexGrow={1}
+        />
+    </FlexThreeSpringVirtualized>
+    <FlexThreeSpringVirtualized
+        marginLeft={0.05}
+        marginRight={0.05}
+        marginBottom={0.05}
+        marginTop={0.05}
+        render
+        id="1"
+        index={1}
+        flexGrow={1}
+    />
+</FlexThreeSpringVirtualizedRoot>
+```
