@@ -6,78 +6,47 @@ export function ValueInput({
     name,
     propertyInfo,
     onChange,
+    value,
 }: {
+    value: any
     name: string
     propertyInfo: FilterType<typeof propertyMap[keyof typeof propertyMap], "value">
     onChange: (value: number | string | undefined) => void
 }) {
-    const [value, setValue] = useState<
-        | {
-              type: "default" | "auto"
-          }
-        | {
-              type: "points" | "percentage"
-              value: number
-          }
-    >({
-        type: "default",
-    })
-
-    const setType = useCallback(
-        (type: "default" | "auto" | "points" | "default") => {
-            if (type === "default") {
-                onChange(undefined)
-                setValue({ type: "default" })
-            } else if (type === "auto") {
-                onChange("auto")
-                setValue({
-                    type: "auto",
-                })
-            } else {
-                onChange(0)
-                setValue({
-                    type,
-                    value: 0,
-                })
+    const setValue = useCallback(
+        (val: string) => {
+            if (propertyInfo.autoUnit && val == "auto") {
+                onChange(val)
+                return
             }
+            const float = parseFloat(val)
+            if (isNaN(float)) {
+                return
+            }
+            if (propertyInfo.percentUnit && val.includes("%")) {
+                onChange(`${float}%`)
+                return
+            }
+            onChange(float)
         },
-        [setValue]
-    )
-
-    const setNumber = useCallback(
-        (val: string) =>
-            setValue((value) => {
-                if (value.type === "auto" || value.type === "default") {
-                    return value
-                }
-                let float = parseFloat(val)
-                if (isNaN(float)) {
-                    float = 0
-                }
-                if (value.type === "percentage") {
-                    onChange(`${float}%`)
-                } else {
-                    onChange(float)
-                }
-                return {
-                    type: value.type,
-                    value: float,
-                }
-            }),
-        [setValue]
+        [propertyInfo, onChange]
     )
 
     return (
-        <div className="m-3 form-group">
+        <div className="m-3 form-group d-flex flex-column">
             <label>{name}</label>
-            <select onChange={(e) => setType(e.target.value as any)} value={value.type} className="form-control">
-                <option>default</option>
-                <option>points</option>
-                <option>percentage</option>
-                <option>auto</option>
-            </select>
-            {(value.type === "points" || value.type === "percentage") && (
-                <input onChange={(e) => setNumber(e.target.value)} value={value.value} className="form-control" />
+            <input
+                onChange={(e) => setValue(e.target.value)}
+                value={value ?? propertyInfo.default ?? ""}
+                className="form-control"
+            />
+            <button className="btn btn-outline-secondary mt-2" onClick={() => onChange(undefined)}>
+                reset
+            </button>
+            {propertyInfo.autoUnit && (
+                <button className="btn btn-outline-secondary mt-2" onClick={() => onChange("auto")}>
+                    auto
+                </button>
             )}
         </div>
     )

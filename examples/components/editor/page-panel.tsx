@@ -1,36 +1,28 @@
 import { VirtualBase } from "co-virtualize"
 import React from "react"
+import { HierarchyPanel } from "./hierarchy-panel"
 import { NodePanel } from "./node-panel"
 import { NodeRenderer } from "./node-renderer"
-import { PageData, State, useStore } from "./state"
+import { State, useStore } from "./state"
 
-function selectMainPage(s: State): PageData | undefined {
-    return s.pages[s.selectedPage]
-}
-
-function selectMainNodeId(s: State): string | undefined {
+function getMainNodeId(s: State): string | undefined {
     return s.pages[s.selectedPage]?.mainNodeId
 }
 
-function getSelectedNodeId(s: State): string | undefined {
-    return s.pages[s.selectedPage]?.selectedNode
-}
-
 export function PagePanel() {
-    const page = useStore(selectMainPage)
-    const mainNodeId = useStore(selectMainNodeId)
-    const selectedNodeId = useStore(getSelectedNodeId)
-    if (page == null || mainNodeId == null) {
+    const mainNodeId = useStore(getMainNodeId)
+    if (mainNodeId == null) {
         return null
     }
     return (
         <div className="flex-grow-1 overflow-hidden d-flex flex-row">
-            <div className="flex-grow-1 position-relative align-items-center justify-content-center">
+            <HierarchyPanel />
+            <div className="flex-grow-1 position-relative align-items-center justify-content-center overflow-auto">
                 <VirtualBase>
                     <NodeRenderer id={mainNodeId} root />
                 </VirtualBase>
             </div>
-            {selectedNodeId && <NodePanel root id={selectedNodeId} />}
+            <NodePanel />
         </div>
     )
 }

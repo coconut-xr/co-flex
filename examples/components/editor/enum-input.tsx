@@ -5,7 +5,9 @@ export function EnumInput({
     name,
     propertyInfo,
     onChange,
+    value,
 }: {
+    value: any | undefined
     name: string
     propertyInfo: FilterType<typeof propertyMap[keyof typeof propertyMap], "enum">
     onChange: (value: string) => void
@@ -15,7 +17,7 @@ export function EnumInput({
             <label>{name}</label>
             <select
                 onChange={(e) => onChange(e.target.value)}
-                defaultValue={propertyInfo.default}
+                value={value ?? propertyInfo.default}
                 className="form-control">
                 {Object.keys(propertyInfo.enumMap).map((name) => (
                     <option key={name}>{name}</option>

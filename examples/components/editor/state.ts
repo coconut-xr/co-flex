@@ -22,11 +22,11 @@ export type NodeData = {
     properties: YogaNodeProperties
 }
 
-function createDefaultNode(index: number): NodeData {
+function createDefaultNode(index: number, properties: YogaNodeProperties = {}): NodeData {
     return {
         index,
         children: [],
-        properties: {},
+        properties,
     }
 }
 
@@ -36,7 +36,7 @@ function createDefaultPage(): PageData {
         mainNodeId: nodeId,
         selectedNode: nodeId,
         nodes: {
-            [nodeId]: createDefaultNode(0),
+            [nodeId]: createDefaultNode(0, { width: 300, height: 300 }),
         },
     }
 }
@@ -95,7 +95,7 @@ export const useStore = create(
                 },
             })
         },
-        addNode: (parentId: string) => {
+        addNode: () => {
             const state = get()
             const selectedPage = state.pages[state.selectedPage]
             if (selectedPage == null) {
@@ -114,7 +114,7 @@ export const useStore = create(
                                     (prev, [nodeId, node]) => ({
                                         ...prev,
                                         [nodeId]:
-                                            nodeId === parentId
+                                            nodeId === selectedPage.selectedNode
                                                 ? {
                                                       ...node,
                                                       children: [...node.children, newNodeId],
@@ -129,8 +129,10 @@ export const useStore = create(
                 },
             })
         },
-        deleteNode: (id: string) => {
+        deleteNode: () => {
             //TODO: update index
+            //TODO: prevent deletion of a mainNode
+            //TODO: delete children recursive
             const state = get()
             const selectedPage = state.pages[state.selectedPage]
             if (selectedPage == null) {
@@ -144,7 +146,7 @@ export const useStore = create(
                         nodes: {
                             ...Object.entries(selectedPage.nodes).reduce(
                                 (prev, [nodeId, node]) =>
-                                    nodeId === id
+                                    nodeId === selectedPage.selectedNode
                                         ? prev
                                         : {
                                               ...prev,
@@ -157,17 +159,12 @@ export const useStore = create(
                 },
             })
         },
-        setNodeProperty: <Name extends keyof YogaNodeProperties>(
-            id: string,
-            name: Name,
-            value: YogaNodeProperties[Name]
-        ) => {
+        setNodeProperty: <Name extends keyof YogaNodeProperties>(name: Name, value: YogaNodeProperties[Name]) => {
             const state = get()
             const selectedPage = state.pages[state.selectedPage]
             if (selectedPage == null) {
                 return
             }
-            console.log(id, name, value)
             set({
                 pages: {
                     ...state.pages,
@@ -180,7 +177,7 @@ export const useStore = create(
                                     (prev, [nodeId, node]) => ({
                                         ...prev,
                                         [nodeId]:
-                                            nodeId === id
+                                            nodeId === selectedPage.selectedNode
                                                 ? {
                                                       ...node,
                                                       properties: {
