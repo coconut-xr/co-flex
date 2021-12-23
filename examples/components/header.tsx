@@ -22,6 +22,10 @@ const pages: Array<{ title: string; url: string }> = [
         title: "Three",
         url: "/three-spring-virtualized",
     },
+    {
+        title: "Gallery",
+        url: "/gallery",
+    },
 ]
 
 export function Header({ selectedIndex }: { selectedIndex: number }) {
