@@ -1,6 +1,10 @@
 @import "./prism.css";
 @import "./node_modules/bootstrap/scss/bootstrap.scss";
 
+.pointer {
+    cursor: pointer;
+}
+
 body {
     margin: 0;
     overflow-x: hidden;
