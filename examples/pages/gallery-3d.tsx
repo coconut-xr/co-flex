@@ -1,8 +1,10 @@
 import { Layout } from "../components/flex-three-spring-virtualized"
 import {
     createContext,
+    MutableRefObject,
     PropsWithChildren,
     ReactNode,
+    RefObject,
     Suspense,
     useCallback,
     useContext,
@@ -30,6 +32,7 @@ import {
 } from "three"
 import { Canvas, useFrame, useThree } from "@react-three/fiber"
 import { useSVG } from "../components/svg"
+import { useDrag } from "@use-gesture/react"
 
 const OffsetContext = createContext<{ position?: Vector3Tuple }>(null as any)
 
@@ -46,7 +49,7 @@ export default function Index() {
     }
     return (
         <Canvas
-            style={{ width: "100vw", height: "100vh" }}
+            style={{ touchAction: "none", width: "100vw", height: "100vh" }}
             gl={{ antialias: true }}
             dpr={global.window == null ? undefined : window.devicePixelRatio}>
             <Scene router={router} />
@@ -68,6 +71,7 @@ function Scene({ router }: { router: NextRouter }) {
                 <Environment preset="city" />
             </Suspense>
             <PerspectiveCamera fov={fov} near={near} makeDefault position={[0, 0, distance]} />
+            <ambientLight intensity={0.1} />
             <group scale={2} position={[-ratio, 1, 0]}>
                 <VirtualBase>
                     <ContainerRoot width={ratio} height={1} flexDirection="column">
@@ -146,25 +150,40 @@ function Toolbar({ back, router }: { router: NextRouter; back: boolean }) {
 const geometry = new EdgesGeometry(new BoxBufferGeometry(1, 1, 1))
 geometry.translate(0.5, -0.5, -0.5)
 
-function Normalized({ opacity, object }: { opacity: SpringValue<number>; object: Object3D }) {
-    const params = useMemo(() => {
+function Normalized({
+    opacity,
+    object,
+    rotation,
+}: {
+    rotation?: SpringValue<Vector3Tuple>
+    opacity: SpringValue<number>
+    object: Object3D
+}) {
+    const [moveToCenter, params] = useMemo(() => {
         object.traverse((o) => {
             if (o instanceof Mesh) {
                 ;(o.material as Material).transparent = true
             }
         })
         boxHelper.setFromObject(object)
+
+        boxHelper.getCenter(vec3Helper)
+        const moveTocenter: Vector3Tuple = [-vec3Helper.x, -vec3Helper.y, -vec3Helper.z]
+
         boxHelper.getSize(vec3Helper)
         const scale: Vector3Tuple = [1 / vec3Helper.x, 1 / vec3Helper.y, vec3Helper.z === 0 ? 1 : 1 / vec3Helper.z]
         const position: Vector3Tuple = [
-            -boxHelper.min.x * scale[0],
-            -boxHelper.max.y * scale[1],
-            -boxHelper.max.z * scale[2],
+            (-boxHelper.min.x - moveTocenter[0]) * scale[0],
+            (-boxHelper.max.y - moveTocenter[1]) * scale[1],
+            (-boxHelper.max.z - moveTocenter[2]) * scale[2],
         ]
-        return {
-            position,
-            scale,
-        }
+        return [
+            moveTocenter,
+            {
+                position,
+                scale,
+            },
+        ]
     }, [object])
     useFrame(() => {
         object.traverse((o) => {
@@ -175,7 +194,11 @@ function Normalized({ opacity, object }: { opacity: SpringValue<number>; object:
     })
     return (
         <group {...params}>
-            <primitive object={object} />
+            <a.group rotation={rotation as any}>
+                <group position={moveToCenter}>
+                    <primitive object={object} />
+                </group>
+            </a.group>
         </group>
     )
 }
@@ -196,7 +219,7 @@ function GridItem({ url, router, index }: { index: number; router: NextRouter; u
             id={url}
             index={index}
             widthDepthRatio={widthDepthRatio}
-            content={(opacity) => (
+            content={(opacity, rotation) => (
                 <group
                     onClick={(e) => {
                         e.stopPropagation()
@@ -212,14 +235,15 @@ function GridItem({ url, router, index }: { index: number; router: NextRouter; u
                             }
                         )
                     }}>
-                    <Normalized opacity={opacity} object={scene} />
+                    <Normalized rotation={rotation} opacity={opacity} object={scene} />
                 </group>
             )}
-            marginBottom={0.02}
-            marginLeft={0.02}
-            marginRight={0.02}
-            marginTop={0.02}
-            width={0.4 * ratio}
+            marginBottom={0.05}
+            marginLeft={0.05}
+            marginRight={0.05}
+            marginTop={0.05}
+            maxWidth={0.4 * ratio}
+            flexShrink={1}
             aspectRatio={ratio}
         />
     )
@@ -233,13 +257,14 @@ function SingleLayout({ url }: { url: string }) {
         boxHelper.getSize(vec3Helper)
         return [vec3Helper.x / vec3Helper.y, vec3Helper.x / vec3Helper.z]
     }, [scene])
+
     return (
         <Container
             index={1}
-            marginBottom={0.02}
-            marginLeft={0.02}
-            marginRight={0.02}
-            marginTop={0.02}
+            marginBottom={0.05}
+            marginLeft={0.05}
+            marginRight={0.05}
+            marginTop={0.05}
             flexDirection="row"
             justifyContent="center"
             flexGrow={1}>
@@ -247,7 +272,8 @@ function SingleLayout({ url }: { url: string }) {
                 widthDepthRatio={widthDepthRatio}
                 flexShrink={1}
                 id={url}
-                content={(opacity) => <Normalized opacity={opacity} object={scene} />}
+                rotate
+                content={(opacity, rotation) => <Normalized rotation={rotation} opacity={opacity} object={scene} />}
                 aspectRatio={ratio}
             />
         </Container>
@@ -282,11 +308,13 @@ export function Container({
     index,
     content,
     widthDepthRatio,
+    rotate,
     ...props
 }: PropsWithChildren<
     Partial<
         {
-            content?: (opacity: SpringValue<number>) => JSX.Element
+            content?: (opacity: SpringValue<number>, rotation: SpringValue<Vector3Tuple>) => JSX.Element
+            rotate: boolean
             widthDepthRatio: number
             id?: string
             index?: number
@@ -323,8 +351,9 @@ export function Container({
                       ]
                     : undefined,
             content,
+            rotate,
         }),
-        [offset, content, layout]
+        [offset, content, layout, rotate]
     )
     useVirtual(VirtualizedContainer, globalLayout, index, id)
 
@@ -338,9 +367,20 @@ export function Container({
 export function VirtualizedContainer({
     destroy,
     controllerProps,
-}: VirtualProps<Layout & { zIndex?: number; content?: (opacity: SpringValue<number>) => JSX.Element }>) {
-    const layoutCache = useRef<Layout & { content?: (opacity: SpringValue<number>) => JSX.Element }>({})
-    const { content, ...layout } = useMemo(() => {
+}: VirtualProps<
+    Layout & {
+        zIndex?: number
+        rotate?: boolean
+        content?: (opacity: SpringValue<number>, rotation: SpringValue<Vector3Tuple>) => JSX.Element
+    }
+>) {
+    const layoutCache = useRef<
+        Layout & {
+            rotate?: boolean
+            content?: (opacity: SpringValue<number>, rotation: SpringValue<Vector3Tuple>) => JSX.Element
+        }
+    >({})
+    const { content, rotate, ...layout } = useMemo(() => {
         if (controllerProps.length > 0 && controllerProps[0].position != null) {
             layoutCache.current = {
                 ...controllerProps[0],
@@ -348,8 +388,9 @@ export function VirtualizedContainer({
         }
         return layoutCache.current
     }, [top, controllerProps])
-    const [{ position, opacity, scale }] = useSpring(
+    const [{ position, opacity, scale, rotation }] = useSpring(
         {
+            rotation: [0, 0, 0] as Vector3Tuple,
             ...layout,
             opacity: layout.position != null && controllerProps.length > 0 ? 1 : 0,
             onRest: {
@@ -363,13 +404,26 @@ export function VirtualizedContainer({
         [layout, controllerProps]
     )
 
+    useDrag(
+        ({ down, delta: [mx, my] }) => {
+            if (down && rotate) {
+                const x2 = (my / window.innerHeight) * 10
+                const y2 = (mx / window.innerHeight) * 10
+                const [x1, y1] = rotation.goal
+                rotation.start([x1 + x2, y1 + y2, 0])
+            }
+        },
+        {
+            target: typeof window === "undefined" ? undefined : window,
+        }
+    )
     if (content == null) {
         return null
     }
 
     return (
-        <a.mesh position={position} scale={scale}>
-            {content(opacity)}
-        </a.mesh>
+        <a.group position={position} scale={scale}>
+            {content(opacity, rotation)}
+        </a.group>
     )
 }
