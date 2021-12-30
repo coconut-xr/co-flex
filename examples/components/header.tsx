@@ -26,6 +26,10 @@ const pages: Array<{ title: string; url: string }> = [
         title: "Gallery",
         url: "/gallery",
     },
+    {
+        title: "Gallery 3D",
+        url: "/gallery-3d",
+    },
 ]
 
 export function Header({ selectedIndex }: { selectedIndex: number }) {
