@@ -24,7 +24,7 @@ export function Footer() {
                         <span className="h5 mb-0">Github</span>
                     </a>
                     <a className="d-flex mx-2" target="_blank" href="https://www.coconut-xr.com/">
-                        <Image loader={loader} layout="fixed" width={170} height={40} src={"/powered-by.svg"} />
+                        <Image loader={loader} alt="powered by coconut capital" width={170} height={40} src={"/powered-by.svg"} />
                     </a>
                 </div>
             </footer>

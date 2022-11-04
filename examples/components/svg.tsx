@@ -12,7 +12,7 @@ import {
     Mesh,
     MeshBasicMaterial,
     Object3D,
-    ShapeBufferGeometry,
+    ShapeGeometry,
     Vector3,
 } from "three"
 import { SVGLoader, SVGResultPaths } from "three-stdlib"
@@ -72,7 +72,7 @@ export function prepareSVGPath(path: SVGResultPaths): Array<SVGPreparedPath> {
 
         preparedPaths.push(
             ...path.toShapes(true).map((shape) => ({
-                bufferGeometry: new ShapeBufferGeometry(shape),
+                bufferGeometry: new ShapeGeometry(shape),
                 material: fillMaterial,
             }))
         )

@@ -2,9 +2,9 @@ import { FlexNode, YogaNodeProperties } from "co-yoga"
 import { useCallback, useEffect, useMemo, useRef } from "react"
 import { useBindFlexNodeProperties, FlexNodeContext, ChangeFlexNode } from "."
 
-export function useYogaRootNode(
+export function useYogaRootNode<T>(
     properties: YogaNodeProperties,
-    onChange: (node: FlexNode) => void,
+    onChange: (node: FlexNode, parentData: T | undefined) => T,
     ups = 10,
     precision = 0.01
 ) {

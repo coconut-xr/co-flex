@@ -84,6 +84,7 @@ function Toolbar({ back }: { back: boolean }) {
                     height={24}
                     content={
                         <img
+                            alt="back btn"
                             width="100%"
                             height="100%"
                             onClick={() => router.back()}
@@ -116,6 +117,7 @@ function GridItem({ url }: { url: string }) {
             id={url}
             content={
                 <img
+                    alt={url}
                     width="100%"
                     height="100%"
                     className="pointer"
@@ -159,7 +161,7 @@ function SingleLayout({ url }: { url: string }) {
             <Container
                 flexShrink={1}
                 id={url}
-                content={<img width="100%" height="100%" src={url} />}
+                content={<img alt={url} width="100%" height="100%" src={url} />}
                 aspectRatio={ratio}
             />
         </Container>

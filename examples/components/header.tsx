@@ -37,8 +37,8 @@ export function Header({ selectedIndex }: { selectedIndex: number }) {
     return (
         <nav className="navbar navbar-expand-lg navbar-light bg-light">
             <div className="container-fluid">
-                <Link href="/" passHref>
-                    <a className="navbar-brand">co-flex examples</a>
+                <Link className="navbar-brand" href="/" passHref>
+                    co-flex examples
                 </Link>
                 <button
                     className="navbar-toggler"
@@ -55,8 +55,8 @@ export function Header({ selectedIndex }: { selectedIndex: number }) {
                     <ul className="navbar-nav">
                         {pages.map(({ title, url }, index) => (
                             <li key={title} className="nav-item">
-                                <Link href={url} passHref>
-                                    <a className={`nav-link ${index === selectedIndex ? "active" : ""}`}>{title}</a>
+                                <Link href={url} className={`nav-link ${index === selectedIndex ? "active" : ""}`}>
+                                    {title}
                                 </Link>
                             </li>
                         ))}

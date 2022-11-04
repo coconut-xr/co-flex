@@ -2,10 +2,10 @@ import { FlexNode, YogaNodeProperties } from "co-yoga"
 import { useEffect, useMemo } from "react"
 import { ChangeFlexNode, FlexNodeContext, useBindFlexNodeProperties, useFlexNodeContext } from "."
 
-export function useYogaNode(
+export function useYogaNode<T>(
     properties: YogaNodeProperties,
     index: number,
-    onChange: (node: FlexNode) => void
+    onChange: (node: FlexNode, parentData: T | undefined) => T
 ): FlexNodeContext {
     const context = useFlexNodeContext()
     const node = useMemo(() => new ChangeFlexNode(context.precision, onChange), [context.precision, onChange])

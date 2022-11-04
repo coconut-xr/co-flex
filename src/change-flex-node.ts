@@ -1,18 +1,18 @@
 import { FlexNode } from "co-yoga"
 
-export class ChangeFlexNode extends FlexNode {
-    constructor(precision: number, private readonly onChange: (node: FlexNode) => void) {
+export class ChangeFlexNode<T> extends FlexNode {
+    constructor(precision: number, private readonly onChange: (node: FlexNode, parentData: T | undefined) => T) {
         super(precision)
     }
     calculateLayout() {
         super.calculateLayout()
-        this.afterCalculation()
+        this.afterCalculation(undefined)
     }
-    protected afterCalculation() {
-        this.onChange(this)
+    protected afterCalculation(parentData: T | undefined) {
+        const data = this.onChange(this, parentData)
         this.commitedChildren.forEach((children) => {
             if (children instanceof ChangeFlexNode) {
-                children.afterCalculation()
+                children.afterCalculation(data)
             }
         })
     }

@@ -1,14 +1,10 @@
 import { Layout } from "../components/flex-three-spring-virtualized"
 import {
     createContext,
-    MutableRefObject,
     PropsWithChildren,
-    ReactNode,
-    RefObject,
     Suspense,
     useCallback,
     useContext,
-    useEffect,
     useMemo,
     useRef,
     useState,
@@ -18,15 +14,15 @@ import { YogaNodeProperties } from "co-yoga"
 import { useSpring, a, SpringValue } from "@react-spring/three"
 import { useYogaNode, useYogaRootNode, FlexNodeContextProvider } from "co-flex"
 import { NextRouter, useRouter } from "next/dist/client/router"
-import { Box, Environment, OrbitControls, PerspectiveCamera, Plane, Text, useGLTF } from "@react-three/drei"
+import { Environment, PerspectiveCamera, Text, useGLTF } from "@react-three/drei"
 import {
     Box3,
-    BoxBufferGeometry,
+    BoxGeometry,
     EdgesGeometry,
     Material,
     Mesh,
     Object3D,
-    PlaneBufferGeometry,
+    PlaneGeometry,
     Vector3,
     Vector3Tuple,
 } from "three"
@@ -104,7 +100,7 @@ function GridLayout({ router }: { router: NextRouter }) {
     )
 }
 
-const planeGeometry = new PlaneBufferGeometry(1, 1)
+const planeGeometry = new PlaneGeometry(1, 1)
 planeGeometry.translate(0.5, -0.5, 0)
 
 function Toolbar({ back, router }: { router: NextRouter; back: boolean }) {
@@ -147,7 +143,7 @@ function Toolbar({ back, router }: { router: NextRouter; back: boolean }) {
     )
 }
 
-const geometry = new EdgesGeometry(new BoxBufferGeometry(1, 1, 1))
+const geometry = new EdgesGeometry(new BoxGeometry(1, 1, 1))
 geometry.translate(0.5, -0.5, -0.5)
 
 function Normalized({
