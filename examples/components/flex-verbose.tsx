@@ -1,20 +1,26 @@
-import { useYogaNode, useFlexNodeContext, useYogaRootNode, FlexNodeContextProvider } from "co-flex"
+import { useYogaNode, useYogaRootNode, FlexNodeContextProvider } from "co-flex"
 import { YogaNodeProperties } from "co-yoga"
 import React, { PropsWithChildren, useCallback, useState } from "react"
 
+const undefinedFactory = () => undefined
+
 export function FlexVerbose({ children, ...props }: PropsWithChildren<Partial<YogaNodeProperties>>) {
     const [{ width, height }, setSize] = useState({ width: 0, height: 0 })
-    const context = useYogaNode(
+
+    const context = useYogaNode<undefined>(
         props,
         0,
         useCallback(
-            (node) =>
+            (node, parentNode, processChildren) => {
                 setSize({
                     width: node.getComputed("width"),
                     height: node.getComputed("height"),
-                }),
+                })
+                processChildren()
+            },
             [setSize]
-        )
+        ),
+        undefinedFactory
     )
 
     return (
@@ -29,16 +35,19 @@ export function FlexVerbose({ children, ...props }: PropsWithChildren<Partial<Yo
 
 export function FlexVerboseRoot({ children, ...props }: PropsWithChildren<Partial<YogaNodeProperties>>) {
     const [{ width, height }, setSize] = useState({ width: 0, height: 0 })
-    const context = useYogaRootNode(
+    const context = useYogaRootNode<undefined>(
         props,
         useCallback(
-            (node) =>
+            (node, parentNode, processChildren) => {
                 setSize({
                     width: node.getComputed("width"),
                     height: node.getComputed("height"),
-                }),
+                })
+                processChildren()
+            },
             [setSize]
-        )
+        ),
+        undefinedFactory
     )
     return (
         <FlexNodeContextProvider context={context}>

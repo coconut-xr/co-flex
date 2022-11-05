@@ -3,17 +3,19 @@ import { YogaNodeProperties } from "co-yoga"
 import React, { PropsWithChildren, useCallback, useState } from "react"
 import { a, useSpring } from "@react-spring/web"
 
+const undefinedFactory = () => undefined
+
 export function FlexDomSpring({
     children,
     index,
     ...props
 }: PropsWithChildren<Partial<{ index?: number } & YogaNodeProperties>>) {
     const [style, api] = useSpring({ top: -1, left: -1, width: -1, height: -1 }, [])
-    const context = useYogaNode(
+    const context = useYogaNode<undefined>(
         props,
         index ?? 0,
         useCallback(
-            (node) => {
+            (node, parentNode, processChildren) => {
                 const newStyle = {
                     width: node.getComputed("width"),
                     height: node.getComputed("height"),
@@ -25,9 +27,11 @@ export function FlexDomSpring({
                 } else {
                     api.start(newStyle)
                 }
+                processChildren()
             },
             [api]
-        )
+        ),
+        undefinedFactory
     )
 
     return (
@@ -39,10 +43,10 @@ export function FlexDomSpring({
 
 export function FlexDomSpringRoot({ children, ...props }: PropsWithChildren<Partial<YogaNodeProperties>>) {
     const [style, api] = useSpring({ width: -1, height: -1, top: -1, left: -1 }, [])
-    const context = useYogaRootNode(
+    const context = useYogaRootNode<undefined>(
         props,
         useCallback(
-            (node) => {
+            (node, parentNode, processChildren) => {
                 const newStyle = {
                     width: node.getComputed("width"),
                     height: node.getComputed("height"),
@@ -54,9 +58,11 @@ export function FlexDomSpringRoot({ children, ...props }: PropsWithChildren<Part
                 } else {
                     api.start(newStyle)
                 }
+                processChildren()
             },
             [api]
         ),
+        undefinedFactory,
         10,
         1
     )

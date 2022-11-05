@@ -1,36 +1,15 @@
 import { Layout } from "../components/flex-three-spring-virtualized"
-import {
-    createContext,
-    PropsWithChildren,
-    Suspense,
-    useCallback,
-    useContext,
-    useMemo,
-    useRef,
-    useState,
-} from "react"
+import { createContext, PropsWithChildren, Suspense, useCallback, useContext, useMemo, useRef, useState } from "react"
 import { useVirtual, VirtualBase, VirtualProps } from "co-virtualize"
 import { YogaNodeProperties } from "co-yoga"
 import { useSpring, a, SpringValue } from "@react-spring/three"
 import { useYogaNode, useYogaRootNode, FlexNodeContextProvider } from "co-flex"
 import { NextRouter, useRouter } from "next/dist/client/router"
 import { Environment, PerspectiveCamera, Text, useGLTF } from "@react-three/drei"
-import {
-    Box3,
-    BoxGeometry,
-    EdgesGeometry,
-    Material,
-    Mesh,
-    Object3D,
-    PlaneGeometry,
-    Vector3,
-    Vector3Tuple,
-} from "three"
+import { Box3, BoxGeometry, EdgesGeometry, Material, Mesh, Object3D, PlaneGeometry, Vector3, Vector3Tuple } from "three"
 import { Canvas, useFrame, useThree } from "@react-three/fiber"
 import { useSVG } from "../components/svg"
 import { useDrag } from "@use-gesture/react"
-
-const OffsetContext = createContext<{ position?: Vector3Tuple }>(null as any)
 
 const modelurls: Array<string> = [
     "/co-flex/models/2CylinderEngine.glb",
@@ -40,9 +19,6 @@ const modelurls: Array<string> = [
 
 export default function Index() {
     const router = useRouter()
-    if (!router.isReady) {
-        return null
-    }
     return (
         <Canvas
             style={{ touchAction: "none", width: "100vw", height: "100vh" }}
@@ -276,26 +252,29 @@ function SingleLayout({ url }: { url: string }) {
     )
 }
 
+type NodeData = { x: number; y: number; z: number }
+
+function createInitData(): NodeData {
+    return {
+        x: 0,
+        y: 0,
+        z: 0,
+    }
+}
+
 export function ContainerRoot({ children, ...props }: PropsWithChildren<Partial<YogaNodeProperties>>) {
-    const [layout, setLayout] = useState<Layout>({})
-    const context = useYogaRootNode(
+    const context = useYogaRootNode<NodeData>(
         props,
-        useCallback(
-            (node) =>
-                setLayout({
-                    position: [node.getComputed("left"), -node.getComputed("top"), 0],
-                    scale: [node.getComputed("width"), node.getComputed("height"), 1],
-                }),
-            []
-        ),
+        useCallback((node, parentNode, processChildren) => {
+            node.data.x = node.getComputed("left")
+            node.data.y = -node.getComputed("top")
+            processChildren()
+        }, []),
+        createInitData,
         10,
         0.001
     )
-    return (
-        <FlexNodeContextProvider context={context}>
-            <OffsetContext.Provider value={layout}>{children}</OffsetContext.Provider>
-        </FlexNodeContextProvider>
-    )
+    return <FlexNodeContextProvider context={context}>{children}</FlexNodeContextProvider>
 }
 
 export function Container({
@@ -318,46 +297,47 @@ export function Container({
     >
 >) {
     const [layout, setLayout] = useState<Layout>({})
-    const offset = useContext(OffsetContext)
-    const context = useYogaNode(
+    const context = useYogaNode<NodeData>(
         props,
         index ?? 0,
         useCallback(
-            (node) => {
+            (node, parentNode, processChildren) => {
                 const width = node.getComputed("width")
                 const depth = widthDepthRatio == null ? 1 : width / widthDepthRatio
-                setLayout({
-                    position: [node.getComputed("left"), -node.getComputed("top"), 0],
-                    scale: [width, node.getComputed("height"), depth],
-                })
+
+                const nodeData = node.data
+                nodeData.x = node.getComputed("left")
+                nodeData.y = node.getComputed("top")
+                nodeData.z = 0
+                if (parentNode != null) {
+                    nodeData.x += parentNode.data.x
+                    nodeData.y += parentNode.data.y
+                    nodeData.z += parentNode.data.z
+                }
+                setLayout &&
+                    setLayout({
+                        position: [nodeData.x, -nodeData.y, nodeData.z],
+                        scale: [width, node.getComputed("height"), depth],
+                    })
+                //nodeData.z += depth
+                processChildren()
             },
             [widthDepthRatio]
-        )
+        ),
+        createInitData
     )
 
     const globalLayout = useMemo<Layout>(
         () => ({
             ...layout,
-            position:
-                layout.position != null && offset.position != null
-                    ? [
-                          layout.position[0] + offset.position[0],
-                          layout.position[1] + offset.position[1],
-                          layout.position[2] + offset.position[2],
-                      ]
-                    : undefined,
             content,
             rotate,
         }),
-        [offset, content, layout, rotate]
+        [content, layout, rotate]
     )
     useVirtual(VirtualizedContainer, globalLayout, index, id)
 
-    return (
-        <FlexNodeContextProvider context={context}>
-            <OffsetContext.Provider value={globalLayout}>{children}</OffsetContext.Provider>
-        </FlexNodeContextProvider>
-    )
+    return <FlexNodeContextProvider context={context}>{children}</FlexNodeContextProvider>
 }
 
 export function VirtualizedContainer({

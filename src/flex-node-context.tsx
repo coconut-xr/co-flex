@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useMemo } from "react"
+import React, { createContext, useContext } from "react"
 import { FlexNode } from "co-yoga"
 
 export type FlexNodeContext = {

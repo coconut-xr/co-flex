@@ -1,5 +1,5 @@
 import { FlexNode, YogaNodeProperties } from "co-yoga"
-import { useRef, useEffect, useMemo } from "react"
+import { useMemo } from "react"
 import { FlexNodeContext } from "."
 
 const emptyObjectFunction = () => ({})

@@ -2,7 +2,6 @@ import { Layout } from "../components/flex-dom-spring-virtualized"
 import {
     createContext,
     PropsWithChildren,
-    ReactNode,
     useCallback,
     useContext,
     useEffect,
@@ -38,9 +37,6 @@ const imageMap: Map<string, HTMLImageElement> =
 export default function Index() {
     const router = useRouter()
     const [width, height] = useSize()
-    if (!router.isReady) {
-        return null
-    }
     return (
         <div
             style={{
@@ -194,20 +190,22 @@ function useSize(): [number, number] {
     return size
 }
 
+const undefinedFactory = () => undefined
+
 export function ContainerRoot({ children, ...props }: PropsWithChildren<Partial<YogaNodeProperties>>) {
     const [layout, setLayout] = useState<Layout>({})
-    const context = useYogaRootNode(
+    const context = useYogaRootNode<undefined>(
         props,
-        useCallback(
-            (node) =>
-                setLayout({
-                    width: node.getComputed("width"),
-                    height: node.getComputed("height"),
-                    left: node.getComputed("left"),
-                    top: node.getComputed("top"),
-                }),
-            []
-        ),
+        useCallback((node, parentNode, processChildren) => {
+            setLayout({
+                width: node.getComputed("width"),
+                height: node.getComputed("height"),
+                left: node.getComputed("left"),
+                top: node.getComputed("top"),
+            })
+            processChildren()
+        }, []),
+        undefinedFactory,
         10,
         1
     )
@@ -235,19 +233,19 @@ export function Container({
 >) {
     const [layout, setLayout] = useState<Layout>({})
     const offset = useContext(OffsetContext)
-    const context = useYogaNode(
+    const context = useYogaNode<undefined>(
         props,
         index ?? 0,
-        useCallback(
-            (node) =>
-                setLayout({
-                    width: node.getComputed("width"),
-                    height: node.getComputed("height"),
-                    left: node.getComputed("left"),
-                    top: node.getComputed("top"),
-                }),
-            []
-        )
+        useCallback((node, parentNode, processChildren) => {
+            setLayout({
+                width: node.getComputed("width"),
+                height: node.getComputed("height"),
+                left: node.getComputed("left"),
+                top: node.getComputed("top"),
+            })
+            processChildren()
+        }, []),
+        undefinedFactory
     )
 
     const globalLayout = useMemo<Layout & { zIndex: number; content?: JSX.Element }>(

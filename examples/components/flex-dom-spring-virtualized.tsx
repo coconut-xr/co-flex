@@ -15,6 +15,8 @@ import { useVirtual, VirtualBase, VirtualProps } from "co-virtualize"
 
 const OffsetContext = createContext<{ zIndex?: number; left?: number; top?: number }>(null as any)
 
+const undefinedFactory = () => undefined
+
 export function FlexDomSpringVirtualized({
     id,
     children,
@@ -24,19 +26,22 @@ export function FlexDomSpringVirtualized({
 }: PropsWithChildren<Partial<{ render: boolean; id?: string; index?: number } & YogaNodeProperties>>) {
     const [layout, setLayout] = useState<Layout>({})
     const offset = useContext(OffsetContext)
-    const context = useYogaNode(
+    const context = useYogaNode<undefined>(
         props,
         index ?? 0,
         useCallback(
-            (node) =>
+            (node, parentNode, processChildren) => {
                 setLayout({
                     width: node.getComputed("width"),
                     height: node.getComputed("height"),
                     left: node.getComputed("left"),
                     top: node.getComputed("top"),
-                }),
-            []
-        )
+                })
+                processChildren()
+            },
+            [setLayout]
+        ),
+        undefinedFactory
     )
 
     const globalLayout = useMemo<Layout & { zIndex: number; render?: boolean }>(
@@ -63,18 +68,21 @@ export type Layout = { top?: number; left?: number; width?: number; height?: num
 
 export function FlexDomSpringVirtualizedRoot({ children, ...props }: PropsWithChildren<Partial<YogaNodeProperties>>) {
     const [layout, setLayout] = useState<Layout>({})
-    const context = useYogaRootNode(
+    const context = useYogaRootNode<undefined>(
         props,
         useCallback(
-            (node) =>
+            (node, parentNode, processChildren) => {
                 setLayout({
                     width: node.getComputed("width"),
                     height: node.getComputed("height"),
                     left: node.getComputed("left"),
                     top: node.getComputed("top"),
-                }),
-            []
+                })
+                processChildren()
+            },
+            [setLayout]
         ),
+        undefinedFactory,
         10,
         1
     )
