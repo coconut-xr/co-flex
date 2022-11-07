@@ -14,14 +14,14 @@ export function FlexDom({
         props,
         index ?? 0,
         useCallback(
-            (node, parentNode, processChildren) => {
+            (node, parentNode) => {
                 setLayout({
                     width: node.getComputed("width"),
                     height: node.getComputed("height"),
                     left: node.getComputed("left"),
                     top: node.getComputed("top"),
                 })
-                processChildren()
+                node.processChildren()
             },
             [setLayout]
         ),
@@ -42,14 +42,14 @@ export function FlexDomRoot({ children, ...props }: PropsWithChildren<Partial<Yo
     const context = useYogaRootNode<undefined>(
         props,
         useCallback(
-            (node, parentNode, processChildren) => {
+            (node, parentNode) => {
                 setLayout({
                     width: node.getComputed("width"),
                     height: node.getComputed("height"),
                     left: node.getComputed("left"),
                     top: node.getComputed("top"),
                 })
-                processChildren()
+                node.processChildren()
             },
             [setLayout]
         ),

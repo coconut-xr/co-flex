@@ -11,12 +11,12 @@ export function FlexVerbose({ children, ...props }: PropsWithChildren<Partial<Yo
         props,
         0,
         useCallback(
-            (node, parentNode, processChildren) => {
+            (node, parentNode) => {
                 setSize({
                     width: node.getComputed("width"),
                     height: node.getComputed("height"),
                 })
-                processChildren()
+                node.processChildren()
             },
             [setSize]
         ),
@@ -38,12 +38,12 @@ export function FlexVerboseRoot({ children, ...props }: PropsWithChildren<Partia
     const context = useYogaRootNode<undefined>(
         props,
         useCallback(
-            (node, parentNode, processChildren) => {
+            (node, parentNode) => {
                 setSize({
                     width: node.getComputed("width"),
                     height: node.getComputed("height"),
                 })
-                processChildren()
+                node.processChildren()
             },
             [setSize]
         ),

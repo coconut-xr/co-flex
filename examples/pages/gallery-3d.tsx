@@ -265,10 +265,10 @@ function createInitData(): NodeData {
 export function ContainerRoot({ children, ...props }: PropsWithChildren<Partial<YogaNodeProperties>>) {
     const context = useYogaRootNode<NodeData>(
         props,
-        useCallback((node, parentNode, processChildren) => {
+        useCallback((node, parentNode) => {
             node.data.x = node.getComputed("left")
             node.data.y = -node.getComputed("top")
-            processChildren()
+            node.processChildren()
         }, []),
         createInitData,
         10,
@@ -301,7 +301,7 @@ export function Container({
         props,
         index ?? 0,
         useCallback(
-            (node, parentNode, processChildren) => {
+            (node, parentNode) => {
                 const width = node.getComputed("width")
                 const depth = widthDepthRatio == null ? 1 : width / widthDepthRatio
 
@@ -320,7 +320,7 @@ export function Container({
                         scale: [width, node.getComputed("height"), depth],
                     })
                 //nodeData.z += depth
-                processChildren()
+                node.processChildren()
             },
             [widthDepthRatio]
         ),

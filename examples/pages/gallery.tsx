@@ -196,14 +196,14 @@ export function ContainerRoot({ children, ...props }: PropsWithChildren<Partial<
     const [layout, setLayout] = useState<Layout>({})
     const context = useYogaRootNode<undefined>(
         props,
-        useCallback((node, parentNode, processChildren) => {
+        useCallback((node, parentNode) => {
             setLayout({
                 width: node.getComputed("width"),
                 height: node.getComputed("height"),
                 left: node.getComputed("left"),
                 top: node.getComputed("top"),
             })
-            processChildren()
+            node.processChildren()
         }, []),
         undefinedFactory,
         10,
@@ -236,14 +236,14 @@ export function Container({
     const context = useYogaNode<undefined>(
         props,
         index ?? 0,
-        useCallback((node, parentNode, processChildren) => {
+        useCallback((node, parentNode) => {
             setLayout({
                 width: node.getComputed("width"),
                 height: node.getComputed("height"),
                 left: node.getComputed("left"),
                 top: node.getComputed("top"),
             })
-            processChildren()
+            node.processChildren()
         }, []),
         undefinedFactory
     )

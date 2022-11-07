@@ -15,7 +15,7 @@ export function FlexDomSpring({
         props,
         index ?? 0,
         useCallback(
-            (node, parentNode, processChildren) => {
+            (node, parentNode) => {
                 const newStyle = {
                     width: node.getComputed("width"),
                     height: node.getComputed("height"),
@@ -27,7 +27,7 @@ export function FlexDomSpring({
                 } else {
                     api.start(newStyle)
                 }
-                processChildren()
+                node.processChildren()
             },
             [api]
         ),
@@ -46,7 +46,7 @@ export function FlexDomSpringRoot({ children, ...props }: PropsWithChildren<Part
     const context = useYogaRootNode<undefined>(
         props,
         useCallback(
-            (node, parentNode, processChildren) => {
+            (node, parentNode) => {
                 const newStyle = {
                     width: node.getComputed("width"),
                     height: node.getComputed("height"),
@@ -58,7 +58,7 @@ export function FlexDomSpringRoot({ children, ...props }: PropsWithChildren<Part
                 } else {
                     api.start(newStyle)
                 }
-                processChildren()
+                node.processChildren()
             },
             [api]
         ),

@@ -16,7 +16,7 @@ function createInitData(): NodeData {
 }
 
 const onChangeFactory: (setLayout: ((layout: Layout) => void) | undefined) => FlexNodeOnChange<NodeData> =
-    (setLayout) => (node, parentNode, processChildren) => {
+    (setLayout) => (node, parentNode) => {
         const nodeData = node.data
         nodeData.x = node.getComputed("left")
         nodeData.y = node.getComputed("top")
@@ -32,7 +32,7 @@ const onChangeFactory: (setLayout: ((layout: Layout) => void) | undefined) => Fl
                 scale: [node.getComputed("width"), node.getComputed("height"), depth],
             })
         nodeData.z += depth
-        processChildren()
+        node.processChildren()
     }
 
 export function FlexThreeSpringVirtualized({

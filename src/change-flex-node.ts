@@ -1,10 +1,6 @@
 import { FlexNode } from "co-yoga"
 
-export type FlexNodeOnChange<T> = (
-    node: FlexNode<T>,
-    parentNode: FlexNode<T> | undefined,
-    processChildren: () => void
-) => void
+export type FlexNodeOnChange<T> = (node: ChangeFlexNode<T>, parentNode: FlexNode<T> | undefined) => void
 
 export class ChangeFlexNode<T> extends FlexNode<T> {
     constructor(precision: number, private readonly onChange: FlexNodeOnChange<T>, data: T) {
@@ -17,10 +13,10 @@ export class ChangeFlexNode<T> extends FlexNode<T> {
     }
 
     protected afterCalculation(parentNode: FlexNode<T> | undefined) {
-        this.onChange(this, parentNode, this.processChildren.bind(this))
+        this.onChange(this, parentNode)
     }
 
-    private processChildren(): void {
+    public processChildren(): void {
         for (const child of this.commitedChildren) {
             if (child instanceof ChangeFlexNode) {
                 child.afterCalculation(this)
