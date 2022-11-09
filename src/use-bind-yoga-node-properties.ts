@@ -25,7 +25,7 @@ export function useBindFlexNodeProperties(
 
     let changed = false
 
-    const prevProperties: YogaNodeProperties | undefined = prev.properties
+    const prevProperties: YogaNodeProperties | undefined = { ...prev.properties }
     const propertyEntries = Object.entries(properties)
     if (prevProperties == null) {
         changed = true
