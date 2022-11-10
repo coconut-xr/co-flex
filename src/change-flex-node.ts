@@ -17,7 +17,7 @@ export class ChangeFlexNode<T> extends FlexNode<T> {
     }
 
     public processChildren(): void {
-        for (const child of this.commitedChildren) {
+        for (const child of this.children) {
             if (child instanceof ChangeFlexNode) {
                 child.afterCalculation(this)
             }
