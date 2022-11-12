@@ -12,7 +12,7 @@ import {
 import { useVirtual, VirtualBase, VirtualProps } from "co-virtualize"
 import { YogaNodeProperties } from "co-yoga"
 import { useSpring, a } from "@react-spring/web"
-import { useYogaNode, useYogaRootNode, FlexNodeContextProvider } from "co-flex"
+import { useYogaNode, useYogaRootNode, FlexNodeContextProvider, ChangeFlexNode } from "co-flex"
 import { useRouter } from "next/dist/client/router"
 
 const OffsetContext = createContext<{ zIndex?: number; left?: number; top?: number }>(null as any)
@@ -190,24 +190,30 @@ function useSize(): [number, number] {
     return size
 }
 
-const undefinedFactory = () => undefined
+const precision = 1
+
+class GalleryNode extends ChangeFlexNode {
+    constructor(precision: number, private setLayout: (layout: Layout) => void) {
+        super(precision)
+    }
+
+    onChange(node: this, parentNode: this | undefined): void {
+        this.setLayout({
+            width: node.getComputed("width"),
+            height: node.getComputed("height"),
+            left: node.getComputed("left"),
+            top: node.getComputed("top"),
+        })
+    }
+}
 
 export function ContainerRoot({ children, ...props }: PropsWithChildren<Partial<YogaNodeProperties>>) {
     const [layout, setLayout] = useState<Layout>({})
-    const context = useYogaRootNode<undefined>(
+    const node = useMemo(() => new GalleryNode(precision, setLayout), [setLayout])
+    const context = useYogaRootNode(
+        node,
         props,
-        useCallback((node, parentNode) => {
-            setLayout({
-                width: node.getComputed("width"),
-                height: node.getComputed("height"),
-                left: node.getComputed("left"),
-                top: node.getComputed("top"),
-            })
-            node.processChildren()
-        }, []),
-        undefinedFactory,
-        10,
-        1
+        10
     )
     return (
         <FlexNodeContextProvider context={context}>
@@ -233,19 +239,11 @@ export function Container({
 >) {
     const [layout, setLayout] = useState<Layout>({})
     const offset = useContext(OffsetContext)
-    const context = useYogaNode<undefined>(
+    const node = useMemo(() => new GalleryNode(precision, setLayout), [setLayout])
+    const context = useYogaNode(
+        node,
         props,
-        index ?? 0,
-        useCallback((node, parentNode) => {
-            setLayout({
-                width: node.getComputed("width"),
-                height: node.getComputed("height"),
-                left: node.getComputed("left"),
-                top: node.getComputed("top"),
-            })
-            node.processChildren()
-        }, []),
-        undefinedFactory
+        index ?? 0
     )
 
     const globalLayout = useMemo<Layout & { zIndex: number; content?: JSX.Element }>(

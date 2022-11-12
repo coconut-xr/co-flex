@@ -3,7 +3,6 @@ import { FlexNode } from "co-yoga"
 
 export type FlexNodeContext = {
     node: FlexNode
-    precision: number
     requestLayoutCalculation: () => void
 }
 

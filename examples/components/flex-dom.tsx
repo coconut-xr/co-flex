@@ -1,8 +1,25 @@
-import { useYogaNode, useYogaRootNode, FlexNodeContextProvider } from "co-flex"
-import { YogaNodeProperties } from "co-yoga"
-import React, { PropsWithChildren, useCallback, useState } from "react"
+import { useYogaNode, useYogaRootNode, FlexNodeContextProvider, ChangeFlexNode } from "co-flex"
+import { FlexNode, YogaNodeProperties } from "co-yoga"
+import React, { PropsWithChildren, useCallback, useMemo, useState } from "react"
 
-const undefinedFactory = () => undefined
+const precision = 1
+
+type Layout = { top: number; left: number; width: number; height: number }
+
+class DomNode extends ChangeFlexNode {
+    constructor(precision: number, private setLayout: (layout: Layout) => void) {
+        super(precision)
+    }
+
+    onChange(node: this, parentNode: this | undefined): void {
+        this.setLayout({
+            width: node.getComputed("width"),
+            height: node.getComputed("height"),
+            left: node.getComputed("left"),
+            top: node.getComputed("top"),
+        })
+    }
+}
 
 export function FlexDom({
     children,
@@ -10,23 +27,8 @@ export function FlexDom({
     ...props
 }: PropsWithChildren<Partial<{ index?: number } & YogaNodeProperties>>) {
     const [style, setLayout] = useState({ top: 0, left: 0, width: 0, height: 0 })
-    const context = useYogaNode<undefined>(
-        props,
-        index ?? 0,
-        useCallback(
-            (node, parentNode) => {
-                setLayout({
-                    width: node.getComputed("width"),
-                    height: node.getComputed("height"),
-                    left: node.getComputed("left"),
-                    top: node.getComputed("top"),
-                })
-                node.processChildren()
-            },
-            [setLayout]
-        ),
-        undefinedFactory
-    )
+    const node = useMemo(() => new DomNode(precision, setLayout), [setLayout])
+    const context = useYogaNode(node, props, index ?? 0)
 
     return (
         <FlexNodeContextProvider context={context}>
@@ -39,24 +41,8 @@ export function FlexDom({
 
 export function FlexDomRoot({ children, ...props }: PropsWithChildren<Partial<YogaNodeProperties>>) {
     const [style, setLayout] = useState({ top: 0, left: 0, width: 0, height: 0 })
-    const context = useYogaRootNode<undefined>(
-        props,
-        useCallback(
-            (node, parentNode) => {
-                setLayout({
-                    width: node.getComputed("width"),
-                    height: node.getComputed("height"),
-                    left: node.getComputed("left"),
-                    top: node.getComputed("top"),
-                })
-                node.processChildren()
-            },
-            [setLayout]
-        ),
-        undefinedFactory,
-        10,
-        1
-    )
+    const node = useMemo(() => new DomNode(precision, setLayout), [setLayout])
+    const context = useYogaRootNode(node, props, 10)
     return (
         <div style={{ width: 300, height: 300, position: "relative" }}>
             <FlexNodeContextProvider context={context}>

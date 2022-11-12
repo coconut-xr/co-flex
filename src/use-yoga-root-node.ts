@@ -1,18 +1,8 @@
-import { YogaNodeProperties } from "co-yoga"
+import { FlexNode, YogaNodeProperties } from "co-yoga"
 import { useCallback, useEffect, useMemo, useRef } from "react"
-import { useBindFlexNodeProperties, FlexNodeContext, ChangeFlexNode, FlexNodeOnChange } from "."
+import { useBindFlexNodeProperties, FlexNodeContext } from "."
 
-export function useYogaRootNode<T>(
-    properties: YogaNodeProperties,
-    onChange: FlexNodeOnChange<T>,
-    dataFactory: () => T,
-    ups = 10,
-    precision = 0.01
-) {
-    const node = useMemo(
-        () => new ChangeFlexNode(precision, onChange, dataFactory()),
-        [precision, onChange, dataFactory]
-    )
+export function useYogaRootNode(node: FlexNode, properties: YogaNodeProperties, ups = 10) {
     const dirtyRef = useRef(false)
     const requestLayoutCalculation = useCallback(() => (dirtyRef.current = true), [])
     useBindFlexNodeProperties(node, requestLayoutCalculation, properties)
@@ -32,10 +22,9 @@ export function useYogaRootNode<T>(
     const context = useMemo<FlexNodeContext>(
         () => ({
             node,
-            precision,
             requestLayoutCalculation,
         }),
-        [node, precision]
+        [node]
     )
     return context
 }

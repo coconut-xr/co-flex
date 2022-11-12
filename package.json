@@ -1,6 +1,6 @@
 {
     "name": "co-flex",
-    "version": "1.2.7",
+    "version": "1.3.0",
     "main": "",
     "description": "React library for an unopinionated flexbox binding using yoga",
     "homepage": "https://cocoss-org.github.io/co-flex",
@@ -29,7 +29,7 @@
         "react": "*"
     },
     "dependencies": {
-        "co-yoga": "^1.0.12"
+        "co-yoga": "^1.0.14"
     },
     "devDependencies": {
         "@types/node": "^18.11.9",

@@ -1,21 +1,34 @@
-import { useYogaNode, useFlexNodeContext, useYogaRootNode, FlexNodeContextProvider } from "co-flex"
-import { YogaNodeProperties } from "co-yoga"
+import { useYogaNode, useYogaRootNode, FlexNodeContextProvider, ChangeFlexNode } from "co-flex"
+import { FlexNode, YogaNodeProperties } from "co-yoga"
 import React, {
     createContext,
     PropsWithChildren,
-    useCallback,
     useContext,
-    useEffect,
     useMemo,
     useRef,
     useState,
 } from "react"
 import { a, useSpring } from "@react-spring/web"
-import { useVirtual, VirtualBase, VirtualProps } from "co-virtualize"
+import { useVirtual, VirtualProps } from "co-virtualize"
+
+const precision = 1
 
 const OffsetContext = createContext<{ zIndex?: number; left?: number; top?: number }>(null as any)
 
-const undefinedFactory = () => undefined
+class DomSpringVirtualizedNode extends ChangeFlexNode {
+    constructor(precision: number, private setLayout: (layout: Layout) => void) {
+        super(precision)
+    }
+
+    onChange(node: this, parentNode: this | undefined): void {
+        this.setLayout({
+            width: node.getComputed("width"),
+            height: node.getComputed("height"),
+            left: node.getComputed("left"),
+            top: node.getComputed("top"),
+        })
+    }
+}
 
 export function FlexDomSpringVirtualized({
     id,
@@ -26,23 +39,8 @@ export function FlexDomSpringVirtualized({
 }: PropsWithChildren<Partial<{ render: boolean; id?: string; index?: number } & YogaNodeProperties>>) {
     const [layout, setLayout] = useState<Layout>({})
     const offset = useContext(OffsetContext)
-    const context = useYogaNode<undefined>(
-        props,
-        index ?? 0,
-        useCallback(
-            (node, parentNode) => {
-                setLayout({
-                    width: node.getComputed("width"),
-                    height: node.getComputed("height"),
-                    left: node.getComputed("left"),
-                    top: node.getComputed("top"),
-                })
-                node.processChildren()
-            },
-            [setLayout]
-        ),
-        undefinedFactory
-    )
+    const node = useMemo(() => new DomSpringVirtualizedNode(precision, setLayout), [setLayout])
+    const context = useYogaNode(node, props, index ?? 0)
 
     const globalLayout = useMemo<Layout & { zIndex: number; render?: boolean }>(
         () => ({
@@ -68,24 +66,8 @@ export type Layout = { top?: number; left?: number; width?: number; height?: num
 
 export function FlexDomSpringVirtualizedRoot({ children, ...props }: PropsWithChildren<Partial<YogaNodeProperties>>) {
     const [layout, setLayout] = useState<Layout>({})
-    const context = useYogaRootNode<undefined>(
-        props,
-        useCallback(
-            (node, parentNode) => {
-                setLayout({
-                    width: node.getComputed("width"),
-                    height: node.getComputed("height"),
-                    left: node.getComputed("left"),
-                    top: node.getComputed("top"),
-                })
-                node.processChildren()
-            },
-            [setLayout]
-        ),
-        undefinedFactory,
-        10,
-        1
-    )
+    const node = useMemo(() => new DomSpringVirtualizedNode(precision, setLayout), [setLayout])
+    const context = useYogaRootNode(node, props, 10)
     return (
         <div>
             <FlexNodeContextProvider context={context}>

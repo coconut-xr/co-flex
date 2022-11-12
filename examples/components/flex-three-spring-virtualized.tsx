@@ -1,22 +1,24 @@
-import { useYogaNode, useYogaRootNode, FlexNodeContextProvider, FlexNodeOnChange } from "co-flex"
+import { useYogaNode, useYogaRootNode, FlexNodeContextProvider, ChangeFlexNode } from "co-flex"
 import { YogaNodeProperties } from "co-yoga"
-import React, { FC, PropsWithChildren, useCallback, useMemo, useRef, useState } from "react"
+import React, { FC, PropsWithChildren, useMemo, useRef, useState } from "react"
 import { a, useSpring } from "@react-spring/three"
 import { useVirtual, VirtualProps } from "co-virtualize"
 import { BoxGeometry, Vector3Tuple } from "three"
 
-type NodeData = { x: number; y: number; z: number }
+const precision = 0.01
 
-function createInitData(): NodeData {
-    return {
+class ThreeSpringVirtualizedNode extends ChangeFlexNode {
+    data = {
         x: 0,
         y: 0,
         z: 0,
     }
-}
 
-const onChangeFactory: (setLayout: ((layout: Layout) => void) | undefined) => FlexNodeOnChange<NodeData> =
-    (setLayout) => (node, parentNode) => {
+    constructor(precision: number, private setLayout?: (layout: Layout) => void) {
+        super(precision)
+    }
+
+    onChange(node: this, parentNode: this): void {
         const nodeData = node.data
         nodeData.x = node.getComputed("left")
         nodeData.y = node.getComputed("top")
@@ -26,14 +28,14 @@ const onChangeFactory: (setLayout: ((layout: Layout) => void) | undefined) => Fl
             nodeData.y += parentNode.data.y
             nodeData.z += parentNode.data.z
         }
-        setLayout &&
-            setLayout({
+        this.setLayout &&
+            this.setLayout({
                 position: [nodeData.x, nodeData.y, nodeData.z],
                 scale: [node.getComputed("width"), node.getComputed("height"), depth],
             })
         nodeData.z += depth
-        node.processChildren()
     }
+}
 
 export function FlexThreeSpringVirtualized({
     id,
@@ -46,11 +48,12 @@ export function FlexThreeSpringVirtualized({
     Partial<{ zOffset?: number; render?: boolean; id?: string; index?: number } & YogaNodeProperties>
 >) {
     const [layout, setLayout] = useState<Layout>({})
-    const context = useYogaNode<NodeData>(
+    
+    const node = useMemo(() => new ThreeSpringVirtualizedNode(precision, setLayout), [setLayout])
+    const context = useYogaNode(
+        node,
         props,
-        index ?? 0,
-        useMemo(() => onChangeFactory(setLayout), []),
-        createInitData
+        index ?? 0
     )
 
     const globalLayout = useMemo<Layout>(
@@ -78,12 +81,11 @@ export type Layout = { position?: Vector3Tuple; scale?: Vector3Tuple }
 const depth = 0.1
 
 export function FlexThreeSpringVirtualizedRoot({ children, ...props }: PropsWithChildren<Partial<YogaNodeProperties>>) {
-    const context = useYogaRootNode<NodeData>(
+    const node = useMemo(() => new ThreeSpringVirtualizedNode(precision), [])
+    const context = useYogaRootNode(
+        node,
         props,
-        useMemo(() => onChangeFactory(undefined), []),
-        createInitData,
-        10,
-        0.01
+        10
     )
     return <FlexNodeContextProvider context={context}>{children}</FlexNodeContextProvider>
 }

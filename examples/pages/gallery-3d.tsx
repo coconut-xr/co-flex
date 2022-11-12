@@ -3,7 +3,7 @@ import { createContext, PropsWithChildren, Suspense, useCallback, useContext, us
 import { useVirtual, VirtualBase, VirtualProps } from "co-virtualize"
 import { YogaNodeProperties } from "co-yoga"
 import { useSpring, a, SpringValue } from "@react-spring/three"
-import { useYogaNode, useYogaRootNode, FlexNodeContextProvider } from "co-flex"
+import { useYogaNode, useYogaRootNode, FlexNodeContextProvider, ChangeFlexNode } from "co-flex"
 import { NextRouter, useRouter } from "next/dist/client/router"
 import { Environment, PerspectiveCamera, Text, useGLTF } from "@react-three/drei"
 import { Box3, BoxGeometry, EdgesGeometry, Material, Mesh, Object3D, PlaneGeometry, Vector3, Vector3Tuple } from "three"
@@ -252,28 +252,43 @@ function SingleLayout({ url }: { url: string }) {
     )
 }
 
-type NodeData = { x: number; y: number; z: number }
+const precision = 0.001
 
-function createInitData(): NodeData {
-    return {
+class Gallery3dNode extends ChangeFlexNode {
+    data = {
         x: 0,
         y: 0,
         z: 0,
     }
+
+    constructor(precision: number, public widthDepthRatio?: number, private setLayout?: (layout: Layout) => void) {
+        super(precision)
+    }
+
+    onChange(node: this, parentNode: this): void {
+        const width = node.getComputed("width")
+        const depth = this.widthDepthRatio == null ? 1 : width / this.widthDepthRatio
+
+        const nodeData = node.data
+        nodeData.x = node.getComputed("left")
+        nodeData.y = node.getComputed("top")
+        nodeData.z = 0
+        if (parentNode != null) {
+            nodeData.x += parentNode.data.x
+            nodeData.y += parentNode.data.y
+            nodeData.z += parentNode.data.z
+        }
+        this.setLayout &&
+            this.setLayout({
+                position: [nodeData.x, -nodeData.y, nodeData.z],
+                scale: [width, node.getComputed("height"), depth],
+            })
+    }
 }
 
 export function ContainerRoot({ children, ...props }: PropsWithChildren<Partial<YogaNodeProperties>>) {
-    const context = useYogaRootNode<NodeData>(
-        props,
-        useCallback((node, parentNode) => {
-            node.data.x = node.getComputed("left")
-            node.data.y = -node.getComputed("top")
-            node.processChildren()
-        }, []),
-        createInitData,
-        10,
-        0.001
-    )
+    const node = useMemo(() => new Gallery3dNode(precision), [])
+    const context = useYogaRootNode(node, props, 10)
     return <FlexNodeContextProvider context={context}>{children}</FlexNodeContextProvider>
 }
 
@@ -297,35 +312,8 @@ export function Container({
     >
 >) {
     const [layout, setLayout] = useState<Layout>({})
-    const context = useYogaNode<NodeData>(
-        props,
-        index ?? 0,
-        useCallback(
-            (node, parentNode) => {
-                const width = node.getComputed("width")
-                const depth = widthDepthRatio == null ? 1 : width / widthDepthRatio
-
-                const nodeData = node.data
-                nodeData.x = node.getComputed("left")
-                nodeData.y = node.getComputed("top")
-                nodeData.z = 0
-                if (parentNode != null) {
-                    nodeData.x += parentNode.data.x
-                    nodeData.y += parentNode.data.y
-                    nodeData.z += parentNode.data.z
-                }
-                setLayout &&
-                    setLayout({
-                        position: [nodeData.x, -nodeData.y, nodeData.z],
-                        scale: [width, node.getComputed("height"), depth],
-                    })
-                //nodeData.z += depth
-                node.processChildren()
-            },
-            [widthDepthRatio]
-        ),
-        createInitData
-    )
+    const node = useMemo(() => new Gallery3dNode(precision, widthDepthRatio, setLayout), [widthDepthRatio, setLayout])
+    const context = useYogaNode(node, props, index ?? 0)
 
     const globalLayout = useMemo<Layout>(
         () => ({
